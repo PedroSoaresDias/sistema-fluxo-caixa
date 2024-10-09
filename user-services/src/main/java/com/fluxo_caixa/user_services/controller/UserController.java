@@ -25,7 +25,7 @@ public class UserController {
     @Autowired
     private UserService userService;
 
-    @GetMapping("/")
+    @GetMapping
     public CompletableFuture<ResponseEntity<List<UserDTO>>> getAllUsers() {
         return userService.getAllUsers().thenApply(ResponseEntity::ok);
     }
@@ -35,15 +35,15 @@ public class UserController {
         return userService.findUserById(id).thenApply(ResponseEntity::ok);
     }
 
-    @PostMapping("/")
+    @PostMapping
     public CompletableFuture<ResponseEntity<User>> createUser(@RequestBody User user) {
         return userService.createUser(user)
                 .thenApply(savedUser -> ResponseEntity.status(HttpStatus.CREATED).body(savedUser));
     }
     
     @PutMapping("/{id}")
-    public CompletableFuture<ResponseEntity<User>> updateUser(@PathVariable Long id, @RequestBody User userDetails) {
-        return userService.updateUser(id, userDetails).thenApply(updatedUser -> ResponseEntity.noContent().build());
+    public CompletableFuture<ResponseEntity<User>> updateUser(@PathVariable Long id, @RequestBody User user) {
+        return userService.updateUser(id, user).thenApply(updatedUser -> ResponseEntity.noContent().build());
     }
 
     @DeleteMapping("/{id}")

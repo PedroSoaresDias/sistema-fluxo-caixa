@@ -47,7 +47,7 @@ public class UserService {
     public CompletableFuture<User> updateUser(Long id, User userDetail) {
         Optional<User> opitionalUser = userRepository.findById(id);
         if (opitionalUser.isPresent()) {
-            User user = new User();
+            User user = opitionalUser.get();
             user.setUsername(userDetail.getUsername());
             user.setEmail(userDetail.getEmail());
             user.setSenha(userDetail.getSenha());
