@@ -2,18 +2,18 @@ package com.fluxo_caixa.user_services.services;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.ResourceAccessException;
 
 import com.fluxo_caixa.user_services.domain.DTO.UserDTO;
 import com.fluxo_caixa.user_services.domain.model.User;
 import com.fluxo_caixa.user_services.domain.repository.UserRepository;
+
+import jakarta.persistence.EntityNotFoundException;
 
 @Service
 public class UserService {
@@ -32,7 +32,7 @@ public class UserService {
     @Async
     public CompletableFuture<UserDTO> findUserById(Long id) {
         User user = userRepository.findById(id)
-            .orElseThrow(() -> new ResourceAccessException("User not found"));
+            .orElseThrow(() -> new EntityNotFoundException("User not found"));
         UserDTO userDTO = convertToDTO(user);
         return CompletableFuture.completedFuture(userDTO);
     }
@@ -45,26 +45,20 @@ public class UserService {
 
     @Async
     public CompletableFuture<User> updateUser(Long id, User userDetail) {
-        Optional<User> opitionalUser = userRepository.findById(id);
-        if (opitionalUser.isPresent()) {
-            User user = opitionalUser.get();
-            user.setUsername(userDetail.getUsername());
-            user.setEmail(userDetail.getEmail());
-            user.setSenha(userDetail.getSenha());
-            return CompletableFuture.completedFuture(userRepository.save(user));
-        } else {
-            throw new ResourceAccessException("User not found with id: " + id);
-        }
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + id));
+
+        user.setUsername(userDetail.getUsername());
+        user.setEmail(userDetail.getEmail());
+        user.setSenha(userDetail.getSenha());
+
+        return CompletableFuture.completedFuture(userRepository.save(user));
     }
 
     @Async
     public CompletableFuture<Void> deleteUser(Long id) {
-        Optional<User> opitionalUser = userRepository.findById(id);
-        if (opitionalUser.isPresent()) {
-            userRepository.delete(opitionalUser.get());
-        } else {
-            throw new ResourceAccessException("User not found with id: " + id);
-        }
+        User user = userRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("User not found with id: " + id));
+        userRepository.delete(user);
         return CompletableFuture.completedFuture(null);
     }
 
