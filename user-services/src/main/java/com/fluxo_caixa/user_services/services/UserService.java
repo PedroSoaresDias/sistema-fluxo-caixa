@@ -13,12 +13,17 @@ import com.fluxo_caixa.user_services.domain.DTO.UserDTO;
 import com.fluxo_caixa.user_services.domain.model.User;
 import com.fluxo_caixa.user_services.domain.repository.UserRepository;
 
+import org.springframework.security.crypto.password.PasswordEncoder;
+
 import jakarta.persistence.EntityNotFoundException;
 
 @Service
 public class UserService {
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder; 
 
     @Async
     public CompletableFuture<List<UserDTO>> getAllUsers() {
@@ -53,6 +58,7 @@ public class UserService {
 
     @Async
     public CompletableFuture<User> createUser(User user) {
+        user.setSenha(passwordEncoder.encode(user.getSenha()));
         user.setCreatedAt(LocalDateTime.now());
         return CompletableFuture.completedFuture(userRepository.save(user));
     }
@@ -64,7 +70,10 @@ public class UserService {
 
         user.setUsername(userDetail.getUsername());
         user.setEmail(userDetail.getEmail());
-        user.setSenha(userDetail.getSenha());
+
+        if (userDetail.getSenha() != null) {
+            user.setSenha(passwordEncoder.encode(userDetail.getSenha()));
+        }
 
         return CompletableFuture.completedFuture(userRepository.save(user));
     }
