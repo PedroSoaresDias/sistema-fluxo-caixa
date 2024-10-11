@@ -2,8 +2,6 @@ package com.fluxo_caixa.auth_services.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-// import org.springframework.scheduling.annotation.Async;
-// import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -29,7 +27,7 @@ public class AuthService implements UserDetailsService {
     public UserDetails loadUserByUsername(String identifier) {
         String url = identifier.contains("@")
             ? userServiceUrl + "/users/email/" + identifier
-            : userServiceUrl + "/users/username" + identifier;
+            : userServiceUrl + "/users/username/" + identifier;
         
         try {
             AuthRequest userDTO = restTemplate.getForObject(url, AuthRequest.class);
@@ -39,7 +37,7 @@ public class AuthService implements UserDetailsService {
             }
 
             return User.withUsername(userDTO.getUsername())
-                    .password(userDTO.getPassword())
+                    .password(userDTO.getSenha())
                     // .authorities(userDTO.getRoles().stream().map(SimpleGrantedAuthority::new).toList())
                     .build();
 

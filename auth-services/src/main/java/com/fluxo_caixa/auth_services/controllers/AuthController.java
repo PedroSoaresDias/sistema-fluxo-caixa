@@ -34,7 +34,7 @@ public class AuthController {
         try {
             UserDetails userDetails = authService.loadUserByUsername(authRequest.getUsername());
     
-            if (!passwordEncoder.matches(authRequest.getPassword(), userDetails.getPassword())) {
+            if (!passwordEncoder.matches(authRequest.getSenha(), userDetails.getPassword())) {
                 return CompletableFuture
                         .completedFuture(ResponseEntity.status(401).body(new AuthResponse("Credenciais inválidas")));
             }
