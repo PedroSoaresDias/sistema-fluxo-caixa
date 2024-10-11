@@ -7,11 +7,11 @@ import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import com.fluxo_caixa.auth_services.services.AuthService;
 import com.fluxo_caixa.auth_services.utils.JwtTokenProvider;
 
 import jakarta.servlet.FilterChain;
@@ -21,11 +21,16 @@ import jakarta.servlet.http.HttpServletResponse;
 
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
-    @Autowired
-    private JwtTokenProvider jwtTokenProvider;
+    
+    private final JwtTokenProvider jwtTokenProvider;
+
+    private final UserDetailsService userDetailsService;
 
     @Autowired
-    private AuthService authService;
+    public JwtAuthenticationFilter(JwtTokenProvider jwtTokenProvider, UserDetailsService userDetailsService) {
+        this.jwtTokenProvider = jwtTokenProvider;
+        this.userDetailsService = userDetailsService;
+    }
 
     @Override
     protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull FilterChain filterChain)
@@ -40,7 +45,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String username = jwtTokenProvider.getUsernameFromToken(token);
 
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            UserDetails userDetails = authService.loadUserDetailsFromExternalService(username);
+            UserDetails userDetails = userDetailsService.loadUserByUsername(username);
             
             if (jwtTokenProvider.validateToken(token, userDetails)) {
                 var authToken = new UsernamePasswordAuthenticationToken(

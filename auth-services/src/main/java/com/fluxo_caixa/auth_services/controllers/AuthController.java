@@ -32,7 +32,7 @@ public class AuthController {
     @PostMapping("/login")
     public CompletableFuture<ResponseEntity<AuthResponse>> login(@RequestBody AuthRequest authRequest) {
         try {
-            UserDetails userDetails = authService.loadUserDetailsFromExternalService(authRequest.getUsername());
+            UserDetails userDetails = authService.loadUserByUsername(authRequest.getUsername());
     
             if (!passwordEncoder.matches(authRequest.getPassword(), userDetails.getPassword())) {
                 return CompletableFuture

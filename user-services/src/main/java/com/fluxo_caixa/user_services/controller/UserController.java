@@ -36,12 +36,12 @@ public class UserController {
     }
 
     @GetMapping("/email/{email}")
-    public CompletableFuture<ResponseEntity<UserDTO>> findUserByEmail(@PathVariable String email) {
+    public CompletableFuture<ResponseEntity<User>> findUserByEmail(@PathVariable String email) {
         return userService.findUserByEmail(email).thenApply(ResponseEntity::ok);
     }
 
     @GetMapping("/username/{username}")
-    public CompletableFuture<ResponseEntity<UserDTO>> findUserByUsername(@PathVariable String username) {
+    public CompletableFuture<ResponseEntity<User>> findUserByUsername(@PathVariable String username) {
         return userService.findUserByUsername(username).thenApply(ResponseEntity::ok);
     }
 
