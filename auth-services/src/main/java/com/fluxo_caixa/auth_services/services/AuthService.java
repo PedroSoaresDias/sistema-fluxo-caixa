@@ -19,8 +19,16 @@ public class AuthService {
     @Autowired
     private RestTemplate restTemplate;
 
-    public UserDetails loadUserDetailsFromExternalService(String username) {
-        String url = userServiceUrl + "/users/" + username;
+    public UserDetails loadUserDetailsFromExternalService(String identifier) {
+        String url;
+
+        if (identifier.matches("\\d+")) {
+            url = userServiceUrl + "/users/id/" + identifier;
+        } else if (identifier.contains("@")) {
+            url = userServiceUrl + "/users/email/" + identifier;
+        } else {
+            url = userServiceUrl + "/users/username/" + identifier;
+        }
         
         try {
             AuthRequest userDTO = restTemplate.getForObject(url, AuthRequest.class);

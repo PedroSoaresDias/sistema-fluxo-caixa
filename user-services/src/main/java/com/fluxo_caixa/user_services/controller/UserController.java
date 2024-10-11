@@ -35,6 +35,16 @@ public class UserController {
         return userService.findUserById(id).thenApply(ResponseEntity::ok);
     }
 
+    @GetMapping("/email/{email}")
+    public CompletableFuture<ResponseEntity<UserDTO>> findUserByEmail(@PathVariable String email) {
+        return userService.findUserByEmail(email).thenApply(ResponseEntity::ok);
+    }
+
+    @GetMapping("/username/{username}")
+    public CompletableFuture<ResponseEntity<UserDTO>> findUserByUsername(@PathVariable String username) {
+        return userService.findUserByUsername(username).thenApply(ResponseEntity::ok);
+    }
+
     @PostMapping
     public CompletableFuture<ResponseEntity<User>> createUser(@RequestBody User user) {
         return userService.createUser(user)
