@@ -12,7 +12,7 @@
 	<artifactId>cash-flow-services</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>cash-flow-services</name>
-	<description>Serviço de autenticação para o sistema de fluxo de caixa</description>
+	<description>Serviço de transações para o sistema de fluxo de caixa</description>
 	<url/>
 	<licenses>
 		<license/>
