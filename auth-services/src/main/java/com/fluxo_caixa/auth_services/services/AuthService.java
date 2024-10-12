@@ -25,9 +25,7 @@ public class AuthService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String identifier) {
-        String url = identifier.contains("@")
-            ? userServiceUrl + "/users/email/" + identifier
-            : userServiceUrl + "/users/username/" + identifier;
+        String url = userServiceUrl + "/users/username/" + identifier;
         
         try {
             AuthRequest userDTO = restTemplate.getForObject(url, AuthRequest.class);

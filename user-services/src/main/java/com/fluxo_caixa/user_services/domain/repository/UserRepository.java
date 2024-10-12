@@ -9,7 +9,5 @@ import com.fluxo_caixa.user_services.domain.model.User;
 
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
-    Optional<User> findByEmail(String email);
-
     Optional<User> findByUsername(String username);
 }

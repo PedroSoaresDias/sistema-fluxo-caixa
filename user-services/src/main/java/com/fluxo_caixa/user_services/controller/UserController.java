@@ -35,11 +35,6 @@ public class UserController {
         return userService.findUserById(id).thenApply(ResponseEntity::ok);
     }
 
-    @GetMapping("/email/{email}")
-    public CompletableFuture<ResponseEntity<User>> findUserByEmail(@PathVariable String email) {
-        return userService.findUserByEmail(email).thenApply(ResponseEntity::ok);
-    }
-
     @GetMapping("/username/{username}")
     public CompletableFuture<ResponseEntity<User>> findUserByUsername(@PathVariable String username) {
         return userService.findUserByUsername(username).thenApply(ResponseEntity::ok);
@@ -48,7 +43,7 @@ public class UserController {
     @PostMapping
     public CompletableFuture<ResponseEntity<User>> createUser(@RequestBody User user) {
         return userService.createUser(user)
-                .thenApply(savedUser -> ResponseEntity.status(HttpStatus.CREATED).body(savedUser));
+                .thenApply(savedUser -> ResponseEntity.status(HttpStatus.CREATED).build());
     }
     
     @PutMapping("/{id}")
@@ -58,6 +53,6 @@ public class UserController {
 
     @DeleteMapping("/{id}")
     public CompletableFuture<ResponseEntity<Void>> deleteUser(@PathVariable Long id) {
-        return userService.deleteUser(id).thenApply(deleteUser -> ResponseEntity.noContent().build());
+        return userService.deleteUser(id).thenApply(deletedUser -> ResponseEntity.noContent().build());
     }
 }

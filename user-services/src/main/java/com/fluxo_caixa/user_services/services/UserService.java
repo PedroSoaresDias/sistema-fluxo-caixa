@@ -41,13 +41,6 @@ public class UserService {
         UserDTO userDTO = convertToDTO(user);
         return CompletableFuture.completedFuture(userDTO);
     }
-    
-    @Async
-    public CompletableFuture<User> findUserByEmail(String email) {
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new EntityNotFoundException("User not found with email: " + email));
-        return CompletableFuture.completedFuture(user);
-    }
 
     @Async
     public CompletableFuture<User> findUserByUsername(String username) {
