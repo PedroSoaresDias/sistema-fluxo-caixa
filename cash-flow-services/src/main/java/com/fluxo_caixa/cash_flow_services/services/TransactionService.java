@@ -4,7 +4,6 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
@@ -15,8 +14,6 @@ import org.springframework.web.client.RestTemplate;
 import com.fluxo_caixa.cash_flow_services.domain.DTO.UserDTO;
 import com.fluxo_caixa.cash_flow_services.domain.model.Transaction;
 import com.fluxo_caixa.cash_flow_services.domain.repository.TransactionRepository;
-
-import ch.qos.logback.classic.Logger;
 
 @Service
 public class TransactionService {
