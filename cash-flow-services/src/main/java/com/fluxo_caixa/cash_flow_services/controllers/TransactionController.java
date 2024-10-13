@@ -26,10 +26,10 @@ public class TransactionController {
     public CompletableFuture<ResponseEntity<List<TransactionDTO>>> getTransactionsByUserId(@PathVariable Long userId) {
         return transactionService.getTransactionsByUserId(userId).thenApply(ResponseEntity::ok);
     }
-    
+
     @PostMapping
-    public CompletableFuture<ResponseEntity<TransactionDTO>> createTransaction(
-            @RequestBody TransactionDTO transactionDTO) {
-        return transactionService.createTransaction(transactionDTO).thenApply(ResponseEntity::ok);
+    public CompletableFuture<ResponseEntity<TransactionDTO>> createTransaction(@RequestBody TransactionDTO transactionDTO) {
+        return transactionService.createTransaction(transactionDTO)
+                .thenApply(ResponseEntity::ok);
     }
 }
