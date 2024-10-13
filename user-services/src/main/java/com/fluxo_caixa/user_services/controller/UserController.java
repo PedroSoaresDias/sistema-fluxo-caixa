@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.fluxo_caixa.user_services.domain.DTO.TransactionDTO;
 import com.fluxo_caixa.user_services.domain.DTO.UserDTO;
 import com.fluxo_caixa.user_services.domain.model.User;
 import com.fluxo_caixa.user_services.services.UserService;
@@ -44,6 +45,12 @@ public class UserController {
     public CompletableFuture<ResponseEntity<User>> createUser(@RequestBody User user) {
         return userService.createUser(user)
                 .thenApply(savedUser -> ResponseEntity.status(HttpStatus.CREATED).build());
+    }
+
+    @PostMapping("/{id}/transactions")
+    public CompletableFuture<ResponseEntity<TransactionDTO>> createTransaction(@PathVariable Long id,
+            @RequestBody TransactionDTO transactionDTO) {
+        return userService.createTransaction(id, transactionDTO).thenApply(ResponseEntity::ok);
     }
     
     @PutMapping("/{id}")

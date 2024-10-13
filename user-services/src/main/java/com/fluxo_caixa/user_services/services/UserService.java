@@ -6,9 +6,13 @@ import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
+import com.fluxo_caixa.user_services.domain.DTO.TransactionDTO;
 import com.fluxo_caixa.user_services.domain.DTO.UserDTO;
 import com.fluxo_caixa.user_services.domain.model.User;
 import com.fluxo_caixa.user_services.domain.repository.UserRepository;
@@ -19,11 +23,17 @@ import jakarta.persistence.EntityNotFoundException;
 
 @Service
 public class UserService {
+    @Value("${fluxo-caixa.service.url}")
+    private String fluxoCaixaServiceUrl;
+
     @Autowired
     private UserRepository userRepository;
 
     @Autowired
-    private PasswordEncoder passwordEncoder; 
+    private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private RestTemplate restTemplate;
 
     @Async
     public CompletableFuture<List<UserDTO>> getAllUsers() {
@@ -54,6 +64,14 @@ public class UserService {
         user.setSenha(passwordEncoder.encode(user.getSenha()));
         user.setCreatedAt(LocalDateTime.now());
         return CompletableFuture.completedFuture(userRepository.save(user));
+    }
+
+    @Async
+    public CompletableFuture<TransactionDTO> createTransaction(Long userId, TransactionDTO transactionDTO) {
+        transactionDTO.setUserId(userId);
+        String url = fluxoCaixaServiceUrl + "/transactions";
+        ResponseEntity<TransactionDTO> response = restTemplate.postForEntity(url, transactionDTO, TransactionDTO.class);
+        return CompletableFuture.completedFuture(response.getBody());
     }
 
     @Async
