@@ -28,17 +28,16 @@ public class TransactionService {
 
     @Async
     public CompletableFuture<Transaction> createTransaction(Transaction transaction) {
-        String url = userServiceUrl + "/users/" + transaction.getUserId();
+        UserDTO userDTO = getUser(transaction.getUserId());
 
-        UserDTO userDTO = restTemplate.getForObject(url, UserDTO.class);
-
-        if (userDTO == null) {
-            throw new UsernameNotFoundException("User not found");
+        if (userDTO.getId() != transaction.getUserId()) {
+            throw new UsernameNotFoundException("User not found for ID: " + userDTO.getId());
+        } else {
+            transaction.setUserId(userDTO.getId());
+            transaction.setDate(LocalDate.now());
+    
+            return CompletableFuture.completedFuture(transactionRepository.save(transaction));
         }
-
-        transaction.setDate(LocalDate.now());
-
-        return CompletableFuture.completedFuture(transactionRepository.save(transaction));
     }
 
     @Async
@@ -46,5 +45,10 @@ public class TransactionService {
         List<Transaction> transactions = transactionRepository.findByUserId(userId);
 
         return CompletableFuture.completedFuture(transactions);
+    }
+
+    public UserDTO getUser(Long userId) {
+        String url = userServiceUrl + "/users/" + userId;
+        return restTemplate.getForObject(url, UserDTO.class);
     }
 }
