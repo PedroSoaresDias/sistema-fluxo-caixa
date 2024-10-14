@@ -1,0 +1,35 @@
+networks:
+  fluxo-caixa-network:
+
+services:
+  fluxo-caixa-user:
+    image: fluxo-caixa-user
+    container_name: fluxo-caixa-user
+    ports:
+      - 8080:8080
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+    networks:
+      - fluxo-caixa-network
+  
+  fluxo-caixa-auth:
+    image: fluxo-caixa-auth
+    container_name: fluxo-caixa-auth
+    ports:
+      - 8081:8081
+    env_file:
+      - .env
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+    networks:
+      - fluxo-caixa-network
+
+  fluxo-caixa-transaction:
+    image: fluxo-caixa-transaction
+    container_name: fluxo-caixa-transaction
+    ports: 
+      - 8082:8082
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+    networks:
+      - fluxo-caixa-network
