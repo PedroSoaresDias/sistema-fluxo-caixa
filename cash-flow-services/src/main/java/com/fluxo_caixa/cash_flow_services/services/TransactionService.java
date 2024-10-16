@@ -50,6 +50,25 @@ public class TransactionService {
     }
 
     @Async
+    public CompletableFuture<List<TransactionDTO>> getAllTransactions() {
+        List<Transaction> transactions = transactionRepository.findAll();
+        List<TransactionDTO> transactionDTOs = transactions.stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
+
+        return CompletableFuture.completedFuture(transactionDTOs);
+    }
+
+    @Async
+    public CompletableFuture<TransactionDTO> getTransactionById(Long id) {
+        Transaction transaction = transactionRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Transaction not found with id: " + id));
+
+        TransactionDTO transactionDTO = convertToDTO(transaction);
+        return CompletableFuture.completedFuture(transactionDTO);
+    }
+
+    @Async
     public CompletableFuture<List<TransactionDTO>> getTransactionsByUserId(Long userId) {
         List<Transaction> transactions = transactionRepository.findByUserId(userId);
         List<TransactionDTO> transactionDTOs = transactions.stream()

@@ -22,6 +22,16 @@ public class TransactionController {
     @Autowired
     private TransactionService transactionService;
 
+    @GetMapping
+    public CompletableFuture<ResponseEntity<List<TransactionDTO>>> getAllTransactions() {
+        return transactionService.getAllTransactions().thenApply(ResponseEntity::ok);
+    }
+
+    @GetMapping("/{id}")
+    public CompletableFuture<ResponseEntity<TransactionDTO>> getTransactionById(@PathVariable Long id) {
+        return transactionService.getTransactionById(id).thenApply(ResponseEntity::ok);
+    }
+
     @GetMapping("/user/{userId}")
     public CompletableFuture<ResponseEntity<List<TransactionDTO>>> getTransactionsByUserId(@PathVariable Long userId) {
         return transactionService.getTransactionsByUserId(userId).thenApply(ResponseEntity::ok);
@@ -29,7 +39,6 @@ public class TransactionController {
 
     @PostMapping
     public CompletableFuture<ResponseEntity<TransactionDTO>> createTransaction(@RequestBody TransactionDTO transactionDTO) {
-        return transactionService.createTransaction(transactionDTO)
-                .thenApply(ResponseEntity::ok);
+        return transactionService.createTransaction(transactionDTO).thenApply(ResponseEntity::ok);
     }
 }
