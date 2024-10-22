@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -48,11 +49,11 @@ public class UserController {
     }
 
     @PostMapping("/{id}/transactions")
-    public CompletableFuture<ResponseEntity<TransactionDTO>> createTransaction(@PathVariable Long id,
-            @RequestBody TransactionDTO transactionDTO) {
-        return userService.createTransaction(id, transactionDTO).thenApply(ResponseEntity::ok);
+    public CompletableFuture<ResponseEntity<TransactionDTO>> createTransaction(@PathVariable Long id, @RequestBody TransactionDTO transactionDTO, @RequestHeader("Authorization") String authorizationHeader) {
+        String jwtToken = authorizationHeader.substring(7);
+        return userService.createTransaction(id, transactionDTO, jwtToken).thenApply(ResponseEntity::ok);
     }
-    
+
     @PutMapping("/{id}")
     public CompletableFuture<ResponseEntity<User>> updateUser(@PathVariable Long id, @RequestBody User user) {
         return userService.updateUser(id, user).thenApply(updatedUser -> ResponseEntity.noContent().build());

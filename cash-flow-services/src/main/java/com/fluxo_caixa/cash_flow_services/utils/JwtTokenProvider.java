@@ -1,9 +1,11 @@
 package com.fluxo_caixa.cash_flow_services.utils;
 
-import java.util.Date;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Value;
-// import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Component;
 
 import com.auth0.jwt.JWT;
@@ -15,19 +17,10 @@ public class JwtTokenProvider {
     @Value("${jwt.secret}")
     private String secret;
 
-    @Value("${jwt.expiration}")
-    private long expirationTime;
-
-    public String createToken(String username) {
-        return JWT.create()
-                .withSubject(username)
-                .withExpiresAt(new Date(System.currentTimeMillis() + expirationTime))
-                .sign(Algorithm.HMAC256(secret));
-    }
-
     public boolean validateToken(String token) {
         try {
-            JWT.require(Algorithm.HMAC256(secret)).build().verify(token);
+            Algorithm algorithm = Algorithm.HMAC256(secret);
+            JWT.require(algorithm).build().verify(token);
             return true;
         } catch (Exception e) {
             return false;
@@ -35,11 +28,16 @@ public class JwtTokenProvider {
     }
     
     public String getUsernameFromToken(String token) {
-        DecodedJWT decodedJWT = JWT.require(Algorithm.HMAC256(secret)).build().verify(token);
+        DecodedJWT decodedJWT = JWT.decode(token);
         return decodedJWT.getSubject();
     }
 
-    // private boolean isTokenExpired(DecodedJWT decodedJWT) {
-    //     return decodedJWT.getExpiresAt().before(new Date());
-    // }
+    public Collection<SimpleGrantedAuthority> getAuthoritiesFromToken(String token) {
+        DecodedJWT decodedJWT = JWT.decode(token);
+        String[] roles = decodedJWT.getClaim("roles").asArray(String.class);
+
+        return Arrays.stream(roles)
+                .map(SimpleGrantedAuthority::new)
+                .collect(Collectors.toList());
+    }
 }

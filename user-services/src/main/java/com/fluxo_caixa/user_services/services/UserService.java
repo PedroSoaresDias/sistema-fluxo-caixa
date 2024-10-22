@@ -7,6 +7,8 @@ import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
@@ -67,10 +69,16 @@ public class UserService {
     }
 
     @Async
-    public CompletableFuture<TransactionDTO> createTransaction(Long userId, TransactionDTO transactionDTO) {
+    public CompletableFuture<TransactionDTO> createTransaction(Long userId, TransactionDTO transactionDTO,
+            String jwtToken) {
         transactionDTO.setUserId(userId);
         String url = fluxoCaixaServiceUrl + "/transactions";
-        ResponseEntity<TransactionDTO> response = restTemplate.postForEntity(url, transactionDTO, TransactionDTO.class);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Authorization", "Bearer " + jwtToken);
+        HttpEntity<TransactionDTO> request = new HttpEntity<>(transactionDTO, headers);
+
+        ResponseEntity<TransactionDTO> response = restTemplate.postForEntity(url, request, TransactionDTO.class);
         return CompletableFuture.completedFuture(response.getBody());
     }
 
@@ -91,7 +99,8 @@ public class UserService {
 
     @Async
     public CompletableFuture<Void> deleteUser(Long id) {
-        User user = userRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("User not found with id: " + id));
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + id));
         userRepository.delete(user);
         return CompletableFuture.completedFuture(null);
     }

@@ -7,6 +7,9 @@ import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
@@ -31,10 +34,8 @@ public class TransactionService {
     private RestTemplate restTemplate;
 
     @Async
-    public CompletableFuture<TransactionDTO> createTransaction(TransactionDTO transactionDTO) {
-        if (!userExists(transactionDTO.getUserId())) {
-            throw new UserNotFoundException("User not found with id: " + transactionDTO.getUserId());
-        }
+    public CompletableFuture<TransactionDTO> createTransaction(TransactionDTO transactionDTO, String jwtToken) {
+        validateUser(transactionDTO.getUserId(), jwtToken);
 
         Transaction transaction = new Transaction();
         transaction.setUserId(transactionDTO.getUserId());
@@ -50,7 +51,10 @@ public class TransactionService {
     }
 
     @Async
-    public CompletableFuture<List<TransactionDTO>> getAllTransactions() {
+    public CompletableFuture<List<TransactionDTO>> getAllTransactions(String jwtToken) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setBearerAuth(jwtToken);
+
         List<Transaction> transactions = transactionRepository.findAll();
         List<TransactionDTO> transactionDTOs = transactions.stream()
                 .map(this::convertToDTO)
@@ -60,7 +64,10 @@ public class TransactionService {
     }
 
     @Async
-    public CompletableFuture<TransactionDTO> getTransactionById(Long id) {
+    public CompletableFuture<TransactionDTO> getTransactionById(Long id, String jwtToken) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setBearerAuth(jwtToken);
+
         Transaction transaction = transactionRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Transaction not found with id: " + id));
 
@@ -69,7 +76,9 @@ public class TransactionService {
     }
 
     @Async
-    public CompletableFuture<List<TransactionDTO>> getTransactionsByUserId(Long userId) {
+    public CompletableFuture<List<TransactionDTO>> getTransactionsByUserId(Long userId, String jwtToken) {
+        validateUser(userId, jwtToken);
+
         List<Transaction> transactions = transactionRepository.findByUserId(userId);
         List<TransactionDTO> transactionDTOs = transactions.stream()
                 .map(this::convertToDTO)
@@ -77,13 +86,19 @@ public class TransactionService {
         return CompletableFuture.completedFuture(transactionDTOs);
     }
 
-    private boolean userExists(Long userId) {
-        try {
-            String url = userServiceUrl + "/users/" + userId;
-            ResponseEntity<UserDTO> response = restTemplate.getForEntity(url, UserDTO.class);
+    public void validateUser(Long userId, String jwtToken) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setBearerAuth(jwtToken);
 
-            return response.getStatusCode().is2xxSuccessful() && response.getBody() != null;
-        } catch (EntityNotFoundException e) {
+        String url = userServiceUrl + "/users/" + userId;
+        HttpEntity<String> entity = new HttpEntity<>(headers);
+
+        try {
+            ResponseEntity<UserDTO> response = restTemplate.exchange(url, HttpMethod.GET, entity, UserDTO.class);
+            if (!response.getStatusCode().is2xxSuccessful() || response.getBody() == null) {
+                throw new UserNotFoundException("User not found with id: " + userId);
+            }
+        } catch (Exception e) {
             throw new UserNotFoundException("User not found with id: " + userId);
         }
     }
