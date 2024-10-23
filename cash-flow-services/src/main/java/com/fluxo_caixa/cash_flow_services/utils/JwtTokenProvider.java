@@ -1,11 +1,11 @@
 package com.fluxo_caixa.cash_flow_services.utils;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.stream.Collectors;
+// import java.util.Arrays;
+// import java.util.Collection;
+// import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
+// import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Component;
 
 import com.auth0.jwt.JWT;
@@ -32,12 +32,12 @@ public class JwtTokenProvider {
         return decodedJWT.getSubject();
     }
 
-    public Collection<SimpleGrantedAuthority> getAuthoritiesFromToken(String token) {
-        DecodedJWT decodedJWT = JWT.decode(token);
-        String[] roles = decodedJWT.getClaim("roles").asArray(String.class);
+    // public Collection<SimpleGrantedAuthority> getAuthoritiesFromToken(String token) {
+    //     DecodedJWT decodedJWT = JWT.decode(token);
+    //     String[] roles = decodedJWT.getClaim("roles").asArray(String.class);
 
-        return Arrays.stream(roles)
-                .map(SimpleGrantedAuthority::new)
-                .collect(Collectors.toList());
-    }
+    //     return Arrays.stream(roles)
+    //             .map(SimpleGrantedAuthority::new)
+    //             .collect(Collectors.toList());
+    // }
 }
