@@ -18,17 +18,18 @@ public class JwtTokenProvider {
     private long expirationTime;
 
     public String createToken(String username) {
+        Algorithm algorithm = Algorithm.HMAC256(secret);
         return JWT.create()
                 .withSubject(username)
-                .withExpiresAt(new Date(System.currentTimeMillis() + expirationTime))
-                .sign(Algorithm.HMAC256(secret));
+                .withExpiresAt(new Date(System.currentTimeMillis() + 3600000))
+                .sign(algorithm);
     }
 
     public boolean validateToken(String token, UserDetails userDetails) {
         String username = getUsernameFromToken(token);
         return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
     }
-    
+
     public String getUsernameFromToken(String token) {
         DecodedJWT decodedJWT = JWT.require(Algorithm.HMAC256(secret)).build().verify(token);
         return decodedJWT.getSubject();

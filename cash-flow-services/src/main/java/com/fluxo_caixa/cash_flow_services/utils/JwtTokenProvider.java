@@ -26,18 +26,19 @@ public class JwtTokenProvider {
             return false;
         }
     }
-    
+
     public String getUsernameFromToken(String token) {
         DecodedJWT decodedJWT = JWT.decode(token);
         return decodedJWT.getSubject();
     }
 
-    // public Collection<SimpleGrantedAuthority> getAuthoritiesFromToken(String token) {
-    //     DecodedJWT decodedJWT = JWT.decode(token);
-    //     String[] roles = decodedJWT.getClaim("roles").asArray(String.class);
+    // public Collection<SimpleGrantedAuthority> getAuthoritiesFromToken(String
+    // token) {
+    // DecodedJWT decodedJWT = JWT.decode(token);
+    // String[] roles = decodedJWT.getClaim("roles").asArray(String.class);
 
-    //     return Arrays.stream(roles)
-    //             .map(SimpleGrantedAuthority::new)
-    //             .collect(Collectors.toList());
+    // return Arrays.stream(roles)
+    // .map(SimpleGrantedAuthority::new)
+    // .collect(Collectors.toList());
     // }
 }

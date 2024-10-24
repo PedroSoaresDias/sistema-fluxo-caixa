@@ -13,13 +13,12 @@ import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import com.fluxo_caixa.cash_flow_services.filters.JwtAuthenticationFilter;
-import com.fluxo_caixa.cash_flow_services.utils.JwtTokenProvider;
 
 @Configuration
 public class AppConfig {
 
     @Autowired
-    private JwtTokenProvider jwtTokenProvider;
+    private JwtAuthenticationFilter jwtAuthFilter;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -28,7 +27,7 @@ public class AppConfig {
                 .authorizeHttpRequests(authz -> authz
                         .requestMatchers("/transactions/**").permitAll()
                         .anyRequest().authenticated())
-                .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
         return http.build();
