@@ -33,6 +33,12 @@ public class TransactionService {
     @Autowired
     private RestTemplate restTemplate;
 
+    private HttpHeaders createHeaders(String jwtToken) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setBearerAuth(jwtToken);
+        return headers;
+    }
+
     @Async
     public CompletableFuture<TransactionDTO> createTransaction(TransactionDTO transactionDTO, String jwtToken) {
         validateUser(transactionDTO.getUserId(), jwtToken);
@@ -51,10 +57,7 @@ public class TransactionService {
     }
 
     @Async
-    public CompletableFuture<List<TransactionDTO>> getAllTransactions(String jwtToken) {
-        HttpHeaders headers = new HttpHeaders();
-        headers.setBearerAuth(jwtToken);
-
+    public CompletableFuture<List<TransactionDTO>> getAllTransactions() {
         List<Transaction> transactions = transactionRepository.findAll();
         List<TransactionDTO> transactionDTOs = transactions.stream()
                 .map(this::convertToDTO)
@@ -87,8 +90,7 @@ public class TransactionService {
     }
 
     public void validateUser(Long userId, String jwtToken) {
-        HttpHeaders headers = new HttpHeaders();
-        headers.setBearerAuth(jwtToken);
+        HttpHeaders headers = createHeaders(jwtToken);
 
         String url = userServiceUrl + "/users/" + userId;
         HttpEntity<String> entity = new HttpEntity<>(headers);

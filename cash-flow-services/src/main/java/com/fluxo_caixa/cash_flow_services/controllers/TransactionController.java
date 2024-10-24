@@ -24,9 +24,8 @@ public class TransactionController {
     private TransactionService transactionService;
 
     @GetMapping
-    public CompletableFuture<ResponseEntity<List<TransactionDTO>>> getAllTransactions(@RequestHeader("Authorization") String authorizationHeader) {
-        String jwtToken = extractToken(authorizationHeader);
-        return transactionService.getAllTransactions(jwtToken).thenApply(ResponseEntity::ok);
+    public CompletableFuture<ResponseEntity<List<TransactionDTO>>> getAllTransactions() {
+        return transactionService.getAllTransactions().thenApply(ResponseEntity::ok);
     }
 
     @GetMapping("/{id}")
