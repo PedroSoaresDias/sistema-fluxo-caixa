@@ -25,8 +25,8 @@ public class AppConfig {
         http
                 .csrf().disable()
                 .authorizeHttpRequests(authz -> authz
-                        .requestMatchers("/transactions/**").permitAll()
-                        .anyRequest().authenticated())
+                        .requestMatchers("/transactions/**").authenticated()
+                        .anyRequest().permitAll())
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 

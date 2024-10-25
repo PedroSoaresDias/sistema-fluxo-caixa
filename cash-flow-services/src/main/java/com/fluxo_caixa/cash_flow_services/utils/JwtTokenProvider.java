@@ -1,5 +1,7 @@
 package com.fluxo_caixa.cash_flow_services.utils;
 
+import java.util.Date;
+
 // import java.util.Arrays;
 // import java.util.Collection;
 // import java.util.stream.Collectors;
@@ -20,16 +22,20 @@ public class JwtTokenProvider {
     public boolean validateToken(String token) {
         try {
             Algorithm algorithm = Algorithm.HMAC256(secret);
-            JWT.require(algorithm).build().verify(token);
-            return true;
+            DecodedJWT decodedJWT = JWT.require(algorithm).build().verify(token);
+            return !isTokenExpired(decodedJWT);
         } catch (Exception e) {
             return false;
         }
     }
 
     public String getUsernameFromToken(String token) {
-        DecodedJWT decodedJWT = JWT.decode(token);
+        DecodedJWT decodedJWT = JWT.require(Algorithm.HMAC256(secret)).build().verify(token);
         return decodedJWT.getSubject();
+    }
+
+    private boolean isTokenExpired(DecodedJWT decodedJWT) {
+        return decodedJWT.getExpiresAt().before(new Date());
     }
 
     // public Collection<SimpleGrantedAuthority> getAuthoritiesFromToken(String
