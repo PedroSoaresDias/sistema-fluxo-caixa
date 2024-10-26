@@ -57,7 +57,10 @@ public class TransactionService {
     }
 
     @Async
-    public CompletableFuture<List<TransactionDTO>> getAllTransactions() {
+    public CompletableFuture<List<TransactionDTO>> getAllTransactions(String jwtToken) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setBearerAuth(jwtToken);
+
         List<Transaction> transactions = transactionRepository.findAll();
         List<TransactionDTO> transactionDTOs = transactions.stream()
                 .map(this::convertToDTO)

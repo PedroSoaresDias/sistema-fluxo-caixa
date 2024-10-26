@@ -17,12 +17,11 @@ public class JwtTokenProvider {
     @Value("${jwt.expiration}")
     private long expirationTime;
 
-    public String createToken(String username) {
-        Algorithm algorithm = Algorithm.HMAC256(secret);
+    public String generateToken(String username) {
         return JWT.create()
                 .withSubject(username)
-                .withExpiresAt(new Date(System.currentTimeMillis() + 3600000))
-                .sign(algorithm);
+                .withExpiresAt(new Date(System.currentTimeMillis() + expirationTime))
+                .sign(Algorithm.HMAC256(secret));
     }
 
     public boolean validateToken(String token, UserDetails userDetails) {

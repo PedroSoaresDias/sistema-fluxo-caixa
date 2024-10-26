@@ -16,12 +16,8 @@ public class AuthService implements UserDetailsService {
     @Value("${user.service.url}")
     private String userServiceUrl;
 
-    private final RestTemplate restTemplate;
-
     @Autowired
-    public AuthService(RestTemplate restTemplate) {
-        this.restTemplate = restTemplate;
-    }
+    private RestTemplate restTemplate;
 
     @Override
     public UserDetails loadUserByUsername(String identifier) {

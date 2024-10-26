@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -24,30 +25,35 @@ public class TransactionController {
     private TransactionService transactionService;
 
     @GetMapping
-    public CompletableFuture<ResponseEntity<List<TransactionDTO>>> getAllTransactions() {
-        return transactionService.getAllTransactions().thenApply(ResponseEntity::ok);
+    public CompletableFuture<ResponseEntity<List<TransactionDTO>>> getAllTransactions(@RequestHeader(HttpHeaders.AUTHORIZATION) String authHeader) {
+        String jwtToken = authHeader.substring(7);
+        return transactionService.getAllTransactions(jwtToken).thenApply(ResponseEntity::ok);
     }
 
     @GetMapping("/{id}")
-    public CompletableFuture<ResponseEntity<TransactionDTO>> getTransactionById(@PathVariable Long id, @RequestHeader("Authorization") String authorizationHeader) {
-        String jwtToken = extractToken(authorizationHeader);
+    public CompletableFuture<ResponseEntity<TransactionDTO>> getTransactionById(@PathVariable Long id,
+            @RequestHeader(HttpHeaders.AUTHORIZATION) String authHeader) {
+        String jwtToken = authHeader.substring(7);
         return transactionService.getTransactionById(id, jwtToken).thenApply(ResponseEntity::ok);
     }
 
     @GetMapping("/user/{userId}")
-    public CompletableFuture<ResponseEntity<List<TransactionDTO>>> getTransactionsByUserId(@PathVariable Long userId, @RequestHeader("Authorization") String authorizationHeader) {
-        String jwtToken = extractToken(authorizationHeader);
+    public CompletableFuture<ResponseEntity<List<TransactionDTO>>> getTransactionsByUserId(@PathVariable Long userId,
+            @RequestHeader(HttpHeaders.AUTHORIZATION) String authHeader) {
+        String jwtToken = authHeader.substring(7);
         return transactionService.getTransactionsByUserId(userId, jwtToken).thenApply(ResponseEntity::ok);
     }
 
     @PostMapping
-    public CompletableFuture<ResponseEntity<TransactionDTO>> createTransaction(@RequestBody TransactionDTO transactionDTO, @RequestHeader("Authorization") String authorizationHeader) {
-        String jwtToken = extractToken(authorizationHeader);
+    public CompletableFuture<ResponseEntity<TransactionDTO>> createTransaction(
+            @RequestBody TransactionDTO transactionDTO, @RequestHeader(HttpHeaders.AUTHORIZATION) String authHeader) {
+        String jwtToken = authHeader.substring(7);
         return transactionService.createTransaction(transactionDTO, jwtToken).thenApply(ResponseEntity::ok);
     }
-    
-    private String extractToken(String authorizationHeader) {
-        return authorizationHeader != null && authorizationHeader.startsWith("Bearer ") ?
-               authorizationHeader.substring(7) : null;
-    }
+
+    // private String extractToken(String authorizationHeader) {
+    // return authorizationHeader != null && authorizationHeader.startsWith("Bearer
+    // ") ?
+    // authorizationHeader.substring(7) : null;
+    // }
 }
