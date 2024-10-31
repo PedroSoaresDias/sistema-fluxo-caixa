@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
@@ -80,6 +81,32 @@ public class UserService {
 
         ResponseEntity<TransactionDTO> response = restTemplate.postForEntity(url, request, TransactionDTO.class);
         return CompletableFuture.completedFuture(response.getBody());
+    }
+
+    @Async
+    public CompletableFuture<TransactionDTO> updateTransaction(Long userId, TransactionDTO transactionDTO,
+            String jwtToken) {
+        transactionDTO.setUserId(userId);
+        String url = fluxoCaixaServiceUrl + "/transactions/" + transactionDTO.getId();
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Authorization", "Bearer " + jwtToken);
+        HttpEntity<TransactionDTO> request = new HttpEntity<>(transactionDTO, headers);
+
+        restTemplate.exchange(url, HttpMethod.PUT, request, TransactionDTO.class);
+        return CompletableFuture.completedFuture(transactionDTO);
+    }
+    
+    @Async
+    public CompletableFuture<Void> deleteTransaction(Long userId, Long transactionId, String jwtToken) {
+        String url = fluxoCaixaServiceUrl + "/transactions/" + transactionId;
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Authorization", "Bearer " + jwtToken);
+        HttpEntity<Void> request = new HttpEntity<>(headers);
+
+        restTemplate.exchange(url, HttpMethod.DELETE ,request, TransactionDTO.class);
+        return CompletableFuture.completedFuture(null);
     }
 
     @Async

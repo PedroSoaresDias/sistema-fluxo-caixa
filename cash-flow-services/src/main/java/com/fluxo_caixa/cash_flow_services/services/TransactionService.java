@@ -57,6 +57,35 @@ public class TransactionService {
     }
 
     @Async
+    public CompletableFuture<TransactionDTO> updateTransaction(Long id, TransactionDTO transactionDTO,
+            String jwtToken) {
+        validateUser(transactionDTO.getUserId(), jwtToken);
+
+        Transaction transaction = transactionRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Transaction not found with id: " + id));
+
+        transaction.setUserId(transactionDTO.getUserId());
+        transaction.setAmount(transactionDTO.getAmount());
+        transaction.setType(transactionDTO.getType());
+        transaction.setDescription(transactionDTO.getDescription());
+
+        Transaction savedTransaction = transactionRepository.save(transaction);
+
+        return CompletableFuture.completedFuture(convertToDTO(savedTransaction));
+    }
+    
+    @Async
+    public CompletableFuture<Void> deleteTransaction(Long id, String jwtToken) {
+        Transaction transaction = transactionRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Transaction not found with id: " + id));
+        
+        validateUser(transaction.getUserId(), jwtToken);
+
+        transactionRepository.delete(transaction);
+        return CompletableFuture.completedFuture(null);
+    }
+
+    @Async
     public CompletableFuture<List<TransactionDTO>> getAllTransactions(String jwtToken) {
         HttpHeaders headers = new HttpHeaders();
         headers.setBearerAuth(jwtToken);

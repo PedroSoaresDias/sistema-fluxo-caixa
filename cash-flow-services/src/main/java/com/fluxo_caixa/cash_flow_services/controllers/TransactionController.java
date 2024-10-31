@@ -6,9 +6,11 @@ import java.util.concurrent.CompletableFuture;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -51,9 +53,16 @@ public class TransactionController {
         return transactionService.createTransaction(transactionDTO, jwtToken).thenApply(ResponseEntity::ok);
     }
 
-    // private String extractToken(String authorizationHeader) {
-    // return authorizationHeader != null && authorizationHeader.startsWith("Bearer
-    // ") ?
-    // authorizationHeader.substring(7) : null;
-    // }
+    @PutMapping("/{id}")
+    public CompletableFuture<ResponseEntity<TransactionDTO>> updateTransaction(@PathVariable Long id,
+            @RequestBody TransactionDTO transactionDTO, @RequestHeader(HttpHeaders.AUTHORIZATION) String authHeader) {
+        String jwtToken = authHeader.substring(7);
+        return transactionService.updateTransaction(id, transactionDTO, jwtToken).thenApply(ResponseEntity::ok);
+    }
+    
+    @DeleteMapping("/{id}")
+    public CompletableFuture<ResponseEntity<Void>> deleteTransaction(@PathVariable Long id, @RequestHeader(HttpHeaders.AUTHORIZATION) String authHeader) {
+        String jwtToken = authHeader.substring(7);
+        return transactionService.deleteTransaction(id, jwtToken).thenApply(ResponseEntity::ok);
+    }
 }

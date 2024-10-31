@@ -49,18 +49,35 @@ public class UserController {
     }
 
     @PostMapping("/{id}/transactions")
-    public CompletableFuture<ResponseEntity<TransactionDTO>> createTransaction(@PathVariable Long id, @RequestBody TransactionDTO transactionDTO, @RequestHeader("Authorization") String authorizationHeader) {
+    public CompletableFuture<ResponseEntity<TransactionDTO>> createTransaction(@PathVariable Long id,
+            @RequestBody TransactionDTO transactionDTO, @RequestHeader("Authorization") String authorizationHeader) {
         String jwtToken = authorizationHeader.substring(7);
-        return userService.createTransaction(id, transactionDTO, jwtToken).thenApply(ResponseEntity::ok);
+        return userService.createTransaction(id, transactionDTO, jwtToken).thenApply(savedTransaction -> ResponseEntity.status(HttpStatus.CREATED).build());
     }
-
+    
+    
     @PutMapping("/{id}")
     public CompletableFuture<ResponseEntity<User>> updateUser(@PathVariable Long id, @RequestBody User user) {
         return userService.updateUser(id, user).thenApply(updatedUser -> ResponseEntity.noContent().build());
     }
-
+    
+    @PutMapping("/{id}/transactions/{transactionId}")
+    public CompletableFuture<ResponseEntity<TransactionDTO>> updateTransaction(@PathVariable Long id,
+            @PathVariable Long transactionId, @RequestBody TransactionDTO transactionDTO,
+            @RequestHeader("Authorization") String authorizationHeader) {
+        String jwtToken = authorizationHeader.substring(7);
+        transactionDTO.setId(transactionId);
+        return userService.updateTransaction(id, transactionDTO, jwtToken).thenApply(updatedTransaction -> ResponseEntity.noContent().build());
+    }
+    
     @DeleteMapping("/{id}")
     public CompletableFuture<ResponseEntity<Void>> deleteUser(@PathVariable Long id) {
         return userService.deleteUser(id).thenApply(deletedUser -> ResponseEntity.noContent().build());
+    }
+
+    @DeleteMapping("/{id}/transactions/{transactionId}")
+    public CompletableFuture<ResponseEntity<Void>> deleteTransaction(@PathVariable Long id, @PathVariable Long transactionId, @RequestBody TransactionDTO transactionDTO, @RequestHeader("Authorization") String authorizationHeader) {
+        String jwtToken = authorizationHeader.substring(7);
+        return userService.deleteTransaction(id, transactionId, jwtToken).thenApply(deletedTransaction -> ResponseEntity.noContent().build());
     }
 }
