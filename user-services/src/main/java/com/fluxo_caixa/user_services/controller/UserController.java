@@ -4,6 +4,9 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 import org.springframework.beans.factory.annotation.Autowired;
+// import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -14,8 +17,10 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+// import com.fluxo_caixa.user_services.domain.DTO.PaginatedResponse;
 import com.fluxo_caixa.user_services.domain.DTO.TransactionDTO;
 import com.fluxo_caixa.user_services.domain.DTO.UserDTO;
 import com.fluxo_caixa.user_services.domain.model.User;
@@ -28,8 +33,9 @@ public class UserController {
     private UserService userService;
 
     @GetMapping
-    public CompletableFuture<ResponseEntity<List<UserDTO>>> getAllUsers() {
-        return userService.getAllUsers().thenApply(ResponseEntity::ok);
+    public CompletableFuture<ResponseEntity<List<UserDTO>>> getAllUsers(@RequestParam(defaultValue = "1") int page, @RequestParam(defaultValue = "20") int size) {
+        Pageable pageable = PageRequest.of(page - 1, size);
+        return userService.getAllUsers(pageable).thenApply(paginatedResponse -> ResponseEntity.ok(paginatedResponse.getContent()));
     }
 
     @GetMapping("/{id}")

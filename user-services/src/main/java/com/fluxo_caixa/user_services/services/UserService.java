@@ -1,12 +1,14 @@
 package com.fluxo_caixa.user_services.services;
 
 import java.time.LocalDateTime;
-import java.util.List;
+// import java.util.List;
 import java.util.concurrent.CompletableFuture;
-import java.util.stream.Collectors;
+// import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -15,6 +17,7 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import com.fluxo_caixa.user_services.domain.DTO.PaginatedResponse;
 import com.fluxo_caixa.user_services.domain.DTO.TransactionDTO;
 import com.fluxo_caixa.user_services.domain.DTO.UserDTO;
 import com.fluxo_caixa.user_services.domain.model.User;
@@ -39,12 +42,10 @@ public class UserService {
     private RestTemplate restTemplate;
 
     @Async
-    public CompletableFuture<List<UserDTO>> getAllUsers() {
-        List<User> users = userRepository.findAll();
-        List<UserDTO> userDTOs = users.stream()
-                .map(this::convertToDTO)
-                .collect(Collectors.toList());
-        return CompletableFuture.completedFuture(userDTOs);
+    public CompletableFuture<PaginatedResponse<UserDTO>> getAllUsers(Pageable pageable) {
+        Page<User> users = userRepository.findAll(pageable);
+        Page<UserDTO> userDTOs = users.map(this::convertToDTO);
+        return CompletableFuture.completedFuture(new PaginatedResponse<>(userDTOs));
     }
 
     @Async
