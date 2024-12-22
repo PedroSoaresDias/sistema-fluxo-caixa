@@ -152,4 +152,29 @@ public class UserServiceTest {
 
         assertFalse(result.isPresent());
     }
+
+    @Test
+    void testDeleteUserById() {
+        User user = new User();
+
+        user.setId(1L);
+
+        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
+
+        userService.deleteUser(1L);
+
+        verify(userRepository, times(1)).findById(1L);
+        verify(userRepository, times(1)).delete(user);
+    }
+
+    @Test
+    void testDeleteUserById_NotFound() {
+        when(userRepository.findById(1L)).thenReturn(Optional.empty());
+
+        EntityNotFoundException exception = assertThrows(EntityNotFoundException.class,
+                () -> userService.deleteUser(1L));
+
+        assertEquals("User not found with id: 1", exception.getMessage());
+        verify(userRepository, never()).deleteById(anyLong());
+    }
 }

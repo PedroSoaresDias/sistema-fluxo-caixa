@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 // import com.fluxo_caixa.user_services.domain.DTO.PaginatedResponse;
@@ -33,22 +34,26 @@ public class UserController {
     private UserService userService;
 
     @GetMapping
+    @ResponseStatus(HttpStatus.OK)
     public CompletableFuture<ResponseEntity<List<UserDTO>>> getAllUsers(@RequestParam(defaultValue = "1") int page, @RequestParam(defaultValue = "20") int size) {
         Pageable pageable = PageRequest.of(page - 1, size);
         return userService.getAllUsers(pageable).thenApply(paginatedResponse -> ResponseEntity.ok(paginatedResponse.getContent()));
     }
 
     @GetMapping("/{id}")
+    @ResponseStatus(HttpStatus.OK)
     public CompletableFuture<ResponseEntity<UserDTO>> findUserById(@PathVariable Long id) {
         return userService.findUserById(id).thenApply(ResponseEntity::ok);
     }
 
     @GetMapping("/username/{username}")
+    @ResponseStatus(HttpStatus.OK)
     public CompletableFuture<ResponseEntity<User>> findUserByUsername(@PathVariable String username) {
         return userService.findUserByUsername(username).thenApply(ResponseEntity::ok);
     }
 
     @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
     public CompletableFuture<ResponseEntity<User>> createUser(@RequestBody User user) {
         return userService.createUser(user)
                 .thenApply(savedUser -> ResponseEntity.status(HttpStatus.CREATED).build());
@@ -63,6 +68,7 @@ public class UserController {
     
     
     @PutMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public CompletableFuture<ResponseEntity<User>> updateUser(@PathVariable Long id, @RequestBody User user) {
         return userService.updateUser(id, user).thenApply(updatedUser -> ResponseEntity.noContent().build());
     }
@@ -77,6 +83,7 @@ public class UserController {
     }
     
     @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public CompletableFuture<ResponseEntity<Void>> deleteUser(@PathVariable Long id) {
         return userService.deleteUser(id).thenApply(deletedUser -> ResponseEntity.noContent().build());
     }
