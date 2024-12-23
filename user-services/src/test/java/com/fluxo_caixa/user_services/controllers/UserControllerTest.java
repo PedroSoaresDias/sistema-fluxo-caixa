@@ -37,7 +37,7 @@ import com.fluxo_caixa.user_services.configurations.AppConfig;
 import com.fluxo_caixa.user_services.controller.UserController;
 import com.fluxo_caixa.user_services.domain.DTO.UserDTO;
 import com.fluxo_caixa.user_services.domain.model.User;
-import com.fluxo_caixa.user_services.services.UserService;
+import com.fluxo_caixa.user_services.services.UserManagementService;
 
 import jakarta.persistence.EntityNotFoundException;
 
@@ -50,7 +50,7 @@ public class UserControllerTest {
     private MockMvc mockMvc;
 
     @MockBean
-    private UserService userService;
+    private UserManagementService userService;
 
     @Autowired
     private ObjectMapper objectMapper;

@@ -39,7 +39,7 @@ public class UserServiceTest {
     private RestTemplate restTemplate;
 
     @InjectMocks
-    private UserService userService;
+    private UserManagementService userManagementService;
 
     @Test
     void testandoCriarUsuario() {
@@ -52,7 +52,7 @@ public class UserServiceTest {
         when(passwordEncoder.encode(anyString())).thenReturn("senhaProtegida");
         when(userRepository.save(any(User.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-        CompletableFuture<User> result = userService.createUser(user);
+        CompletableFuture<User> result = userManagementService.createUser(user);
 
         User createUser = result.join();
 
@@ -73,7 +73,7 @@ public class UserServiceTest {
         when(passwordEncoder.encode("1234abc")).thenReturn("senhaProtegida");
         when(userRepository.save(any(User.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-        CompletableFuture<User> result = userService.updateUser(1L, user);
+        CompletableFuture<User> result = userManagementService.updateUser(1L, user);
 
         User updatedUser = result.join();
 
@@ -96,7 +96,7 @@ public class UserServiceTest {
 
         // Execução e verificação
         EntityNotFoundException exception = assertThrows(EntityNotFoundException.class,
-                () -> userService.updateUser(1L, user));
+                () -> userManagementService.updateUser(1L, user));
 
         assertEquals("User not found with id: 1", exception.getMessage());
         verify(userRepository, times(1)).findById(1L);
@@ -161,7 +161,7 @@ public class UserServiceTest {
 
         when(userRepository.findById(1L)).thenReturn(Optional.of(user));
 
-        userService.deleteUser(1L);
+        userManagementService.deleteUser(1L);
 
         verify(userRepository, times(1)).findById(1L);
         verify(userRepository, times(1)).delete(user);
@@ -172,7 +172,7 @@ public class UserServiceTest {
         when(userRepository.findById(1L)).thenReturn(Optional.empty());
 
         EntityNotFoundException exception = assertThrows(EntityNotFoundException.class,
-                () -> userService.deleteUser(1L));
+                () -> userManagementService.deleteUser(1L));
 
         assertEquals("User not found with id: 1", exception.getMessage());
         verify(userRepository, never()).deleteById(anyLong());

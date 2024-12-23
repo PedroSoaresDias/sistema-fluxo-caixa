@@ -8,7 +8,6 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import com.fluxo_caixa.user_services.domain.DTO.PaginatedResponse;
-import com.fluxo_caixa.user_services.domain.DTO.TransactionDTO;
 import com.fluxo_caixa.user_services.domain.DTO.UserDTO;
 import com.fluxo_caixa.user_services.domain.converter.UserConverter;
 import com.fluxo_caixa.user_services.domain.model.User;
@@ -19,15 +18,13 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import jakarta.persistence.EntityNotFoundException;
 
 @Service
-public class UserService {
+public class UserManagementService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
-    private final TransactionService transactionService;
 
-    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, TransactionService transactionService) {
+    public UserManagementService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
-        this.transactionService = transactionService;
     }
 
     @Async
@@ -57,26 +54,6 @@ public class UserService {
         user.setSenha(passwordEncoder.encode(user.getSenha()));
         user.setCreatedAt(LocalDateTime.now());
         return CompletableFuture.completedFuture(userRepository.save(user));
-    }
-
-    @Async
-    public CompletableFuture<TransactionDTO> createTransaction(Long userId, TransactionDTO transactionDTO,
-            String jwtToken) {
-        transactionDTO.setUserId(userId);
-        return CompletableFuture.completedFuture(transactionService.createTransaction(transactionDTO, jwtToken));
-    }
-
-    @Async
-    public CompletableFuture<TransactionDTO> updateTransaction(Long userId, TransactionDTO transactionDTO,
-            String jwtToken) {
-        transactionDTO.setUserId(userId);
-        return CompletableFuture.completedFuture(transactionService.updateTransaction(transactionDTO, jwtToken));
-    }
-    
-    @Async
-    public CompletableFuture<Boolean> deleteTransaction(Long userId, Long transactionId, String jwtToken) {
-        boolean success = transactionService.deleteTransaction(transactionId, jwtToken);
-        return CompletableFuture.completedFuture(success);
     }
 
     @Async
