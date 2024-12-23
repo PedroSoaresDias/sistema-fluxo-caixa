@@ -78,8 +78,6 @@ public class TransactionService {
     public CompletableFuture<Void> deleteTransaction(Long id, String jwtToken) {
         Transaction transaction = transactionRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Transaction not found with id: " + id));
-        
-        validateUser(transaction.getUserId(), jwtToken);
 
         transactionRepository.delete(transaction);
         return CompletableFuture.completedFuture(null);

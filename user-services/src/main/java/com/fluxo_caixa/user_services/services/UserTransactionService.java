@@ -27,10 +27,4 @@ public class UserTransactionService {
         transactionDTO.setUserId(userId);
         return CompletableFuture.completedFuture(transactionService.updateTransaction(transactionDTO, jwtToken));
     }
-    
-    @Async
-    public CompletableFuture<Boolean> deleteTransaction(Long userId, Long transactionId, String jwtToken) {
-        boolean success = transactionService.deleteTransaction(transactionId, jwtToken);
-        return CompletableFuture.completedFuture(success);
-    }
 }

@@ -90,10 +90,4 @@ public class UserController {
     public CompletableFuture<ResponseEntity<Void>> deleteUser(@PathVariable Long id) {
         return userManagementService.deleteUser(id).thenApply(deletedUser -> ResponseEntity.noContent().build());
     }
-
-    @DeleteMapping("/{id}/transactions/{transactionId}")
-    public CompletableFuture<ResponseEntity<Void>> deleteTransaction(@PathVariable Long id, @PathVariable Long transactionId, @RequestHeader("Authorization") String authorizationHeader) {
-        String jwtToken = authorizationHeader.substring(7);
-        return userTransactionService.deleteTransaction(id, transactionId, jwtToken).thenApply(deletedTransaction -> ResponseEntity.noContent().build());
-    }
 }
