@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 import org.springframework.beans.factory.annotation.Autowired;
-// import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -21,7 +20,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-// import com.fluxo_caixa.user_services.domain.DTO.PaginatedResponse;
 import com.fluxo_caixa.user_services.domain.DTO.TransactionDTO;
 import com.fluxo_caixa.user_services.domain.DTO.UserDTO;
 import com.fluxo_caixa.user_services.domain.model.User;
@@ -89,7 +87,7 @@ public class UserController {
     }
 
     @DeleteMapping("/{id}/transactions/{transactionId}")
-    public CompletableFuture<ResponseEntity<Void>> deleteTransaction(@PathVariable Long id, @PathVariable Long transactionId, @RequestBody TransactionDTO transactionDTO, @RequestHeader("Authorization") String authorizationHeader) {
+    public CompletableFuture<ResponseEntity<Void>> deleteTransaction(@PathVariable Long id, @PathVariable Long transactionId, @RequestHeader("Authorization") String authorizationHeader) {
         String jwtToken = authorizationHeader.substring(7);
         return userService.deleteTransaction(id, transactionId, jwtToken).thenApply(deletedTransaction -> ResponseEntity.noContent().build());
     }

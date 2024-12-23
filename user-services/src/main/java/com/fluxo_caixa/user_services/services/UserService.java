@@ -1,25 +1,16 @@
 package com.fluxo_caixa.user_services.services;
 
 import java.time.LocalDateTime;
-// import java.util.List;
 import java.util.concurrent.CompletableFuture;
-// import java.util.stream.Collectors;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
 
 import com.fluxo_caixa.user_services.domain.DTO.PaginatedResponse;
 import com.fluxo_caixa.user_services.domain.DTO.TransactionDTO;
 import com.fluxo_caixa.user_services.domain.DTO.UserDTO;
+import com.fluxo_caixa.user_services.domain.converter.UserConverter;
 import com.fluxo_caixa.user_services.domain.model.User;
 import com.fluxo_caixa.user_services.domain.repository.UserRepository;
 
@@ -29,22 +20,20 @@ import jakarta.persistence.EntityNotFoundException;
 
 @Service
 public class UserService {
-    @Value("${fluxo-caixa.service.url}")
-    private String fluxoCaixaServiceUrl;
+    private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
+    private final TransactionService transactionService;
 
-    @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
-    private PasswordEncoder passwordEncoder;
-
-    @Autowired
-    private RestTemplate restTemplate;
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, TransactionService transactionService) {
+        this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
+        this.transactionService = transactionService;
+    }
 
     @Async
     public CompletableFuture<PaginatedResponse<UserDTO>> getAllUsers(Pageable pageable) {
         Page<User> users = userRepository.findAll(pageable);
-        Page<UserDTO> userDTOs = users.map(this::convertToDTO);
+        Page<UserDTO> userDTOs = users.map(UserConverter::toDTO);
         return CompletableFuture.completedFuture(new PaginatedResponse<>(userDTOs));
     }
 
@@ -52,7 +41,7 @@ public class UserService {
     public CompletableFuture<UserDTO> findUserById(Long id) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + id));
-        UserDTO userDTO = convertToDTO(user);
+        UserDTO userDTO = UserConverter.toDTO(user);
         return CompletableFuture.completedFuture(userDTO);
     }
 
@@ -74,40 +63,20 @@ public class UserService {
     public CompletableFuture<TransactionDTO> createTransaction(Long userId, TransactionDTO transactionDTO,
             String jwtToken) {
         transactionDTO.setUserId(userId);
-        String url = fluxoCaixaServiceUrl + "/transactions";
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.set("Authorization", "Bearer " + jwtToken);
-        HttpEntity<TransactionDTO> request = new HttpEntity<>(transactionDTO, headers);
-
-        ResponseEntity<TransactionDTO> response = restTemplate.postForEntity(url, request, TransactionDTO.class);
-        return CompletableFuture.completedFuture(response.getBody());
+        return CompletableFuture.completedFuture(transactionService.createTransaction(transactionDTO, jwtToken));
     }
 
     @Async
     public CompletableFuture<TransactionDTO> updateTransaction(Long userId, TransactionDTO transactionDTO,
             String jwtToken) {
         transactionDTO.setUserId(userId);
-        String url = fluxoCaixaServiceUrl + "/transactions/" + transactionDTO.getId();
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.set("Authorization", "Bearer " + jwtToken);
-        HttpEntity<TransactionDTO> request = new HttpEntity<>(transactionDTO, headers);
-
-        restTemplate.exchange(url, HttpMethod.PUT, request, TransactionDTO.class);
-        return CompletableFuture.completedFuture(transactionDTO);
+        return CompletableFuture.completedFuture(transactionService.updateTransaction(transactionDTO, jwtToken));
     }
     
     @Async
-    public CompletableFuture<Void> deleteTransaction(Long userId, Long transactionId, String jwtToken) {
-        String url = fluxoCaixaServiceUrl + "/transactions/" + transactionId;
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.set("Authorization", "Bearer " + jwtToken);
-        HttpEntity<Void> request = new HttpEntity<>(headers);
-
-        restTemplate.exchange(url, HttpMethod.DELETE ,request, TransactionDTO.class);
-        return CompletableFuture.completedFuture(null);
+    public CompletableFuture<Boolean> deleteTransaction(Long userId, Long transactionId, String jwtToken) {
+        boolean success = transactionService.deleteTransaction(transactionId, jwtToken);
+        return CompletableFuture.completedFuture(success);
     }
 
     @Async
@@ -131,13 +100,5 @@ public class UserService {
                 .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + id));
         userRepository.delete(user);
         return CompletableFuture.completedFuture(null);
-    }
-
-    private UserDTO convertToDTO(User user) {
-        UserDTO userDTO = new UserDTO();
-        userDTO.setId(user.getId());
-        userDTO.setUsername(user.getUsername());
-        userDTO.setEmail(user.getEmail());
-        return userDTO;
     }
 }
