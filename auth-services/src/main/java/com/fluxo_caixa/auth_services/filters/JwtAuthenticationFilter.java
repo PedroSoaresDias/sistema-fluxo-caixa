@@ -2,7 +2,6 @@ package com.fluxo_caixa.auth_services.filters;
 
 import java.io.IOException;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -12,7 +11,7 @@ import org.springframework.security.web.authentication.WebAuthenticationDetailsS
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import com.fluxo_caixa.auth_services.utils.JwtTokenProvider;
+import com.fluxo_caixa.auth_services.utils.JwtTokenValidator;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -21,13 +20,12 @@ import jakarta.servlet.http.HttpServletResponse;
 
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
-    private final JwtTokenProvider jwtTokenProvider;
+    private final JwtTokenValidator jwtTokenValidator;
 
     private final UserDetailsService userDetailsService;
 
-    @Autowired
-    public JwtAuthenticationFilter(JwtTokenProvider jwtTokenProvider, UserDetailsService userDetailsService) {
-        this.jwtTokenProvider = jwtTokenProvider;
+    public JwtAuthenticationFilter(JwtTokenValidator jwtTokenValidator, UserDetailsService userDetailsService) {
+        this.jwtTokenValidator = jwtTokenValidator;
         this.userDetailsService = userDetailsService;
     }
 
@@ -41,12 +39,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
         String token = authHeader.substring(7);
-        String username = jwtTokenProvider.getUsernameFromToken(token);
+        String username = jwtTokenValidator.getUsernameFromToken(token);
 
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             UserDetails userDetails = userDetailsService.loadUserByUsername(username);
 
-            if (jwtTokenProvider.validateToken(token, userDetails)) {
+            if (jwtTokenValidator.validateToken(token, userDetails)) {
                 var authToken = new UsernamePasswordAuthenticationToken(
                         userDetails, null, null);
                 authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
