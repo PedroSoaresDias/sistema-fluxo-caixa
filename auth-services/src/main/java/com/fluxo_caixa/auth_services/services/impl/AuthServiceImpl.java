@@ -12,15 +12,16 @@ import org.springframework.stereotype.Service;
 import com.fluxo_caixa.auth_services.domain.DTO.AuthRequest;
 import com.fluxo_caixa.auth_services.domain.DTO.AuthResponse;
 import com.fluxo_caixa.auth_services.services.AuthService;
+import com.fluxo_caixa.auth_services.services.UserService;
 import com.fluxo_caixa.auth_services.utils.JwtTokenGenerator;
 
 @Service
 public class AuthServiceImpl implements AuthService, UserDetailsService {
-    private final RemoteUserService userService;
+    private final UserService userService;
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenGenerator jwtTokenGenerator;
 
-    public AuthServiceImpl(RemoteUserService userService, PasswordEncoder passwordEncoder, JwtTokenGenerator jwtTokenGenerator) {
+    public AuthServiceImpl(UserService userService, PasswordEncoder passwordEncoder, JwtTokenGenerator jwtTokenGenerator) {
         this.userService = userService;
         this.passwordEncoder = passwordEncoder;
         this.jwtTokenGenerator = jwtTokenGenerator;
