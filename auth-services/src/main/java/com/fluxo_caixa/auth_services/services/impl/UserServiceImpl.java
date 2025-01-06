@@ -8,11 +8,11 @@ import com.fluxo_caixa.auth_services.domain.DTO.AuthRequest;
 import com.fluxo_caixa.auth_services.services.UserService;
 
 @Service
-public class RemoteUserService implements UserService {
+public class UserServiceImpl implements UserService {
     private final String userServiceUrl;
     private final HttpClientAdapter httpClient;
 
-    public RemoteUserService(HttpClientAdapter httpClient, @Value("${user.service.url}") String userServiceUrl) {
+    public UserServiceImpl(HttpClientAdapter httpClient, @Value("${user.service.url}") String userServiceUrl) {
         this.httpClient = httpClient;
         this.userServiceUrl = userServiceUrl;
     }
