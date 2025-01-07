@@ -3,7 +3,6 @@ package com.fluxo_caixa.cash_flow_services.controllers;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -23,8 +22,11 @@ import com.fluxo_caixa.cash_flow_services.services.TransactionService;
 @RequestMapping("/transactions")
 public class TransactionController {
 
-    @Autowired
-    private TransactionService transactionService;
+    private final TransactionService transactionService;
+
+    public TransactionController(TransactionService transactionService) {
+        this.transactionService = transactionService;
+    }
 
     @GetMapping
     public CompletableFuture<ResponseEntity<List<TransactionDTO>>> getAllTransactions(@RequestHeader(HttpHeaders.AUTHORIZATION) String authHeader) {

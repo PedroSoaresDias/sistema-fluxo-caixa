@@ -5,11 +5,12 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import com.fluxo_caixa.user_services.domain.DTO.TransactionDTO;
+import com.fluxo_caixa.user_services.services.TransactionService;
 import com.fluxo_caixa.user_services.services.UserTransactionService;
 
 @Service
 public class UserTransactionServiceImpl implements UserTransactionService {
-    private final TransactionServiceImpl transactionService;
+    private final TransactionService transactionService;
 
     public UserTransactionServiceImpl(TransactionServiceImpl transactionService) {
         this.transactionService = transactionService;

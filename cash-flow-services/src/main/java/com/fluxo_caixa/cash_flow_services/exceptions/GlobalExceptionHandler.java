@@ -6,7 +6,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
-// import org.springframework.web.client.HttpClientErrorException.*;
 
 import jakarta.persistence.EntityNotFoundException;
 
@@ -18,12 +17,6 @@ public class GlobalExceptionHandler {
     public ResponseEntity<String> handleNotFoundException(EntityNotFoundException ex) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
     }
-
-    // @ExceptionHandler(UnauthorizedException.class)
-    // @ResponseStatus(HttpStatus.UNAUTHORIZED)
-    // public ResponseEntity<String> handleUnauthorizedException(UnauthorizedException ex) {
-    //     return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Authentication failed: " + ex.getMessage());
-    // }
 
     @ExceptionHandler(AccessDeniedException.class)
     @ResponseStatus(HttpStatus.FORBIDDEN)
