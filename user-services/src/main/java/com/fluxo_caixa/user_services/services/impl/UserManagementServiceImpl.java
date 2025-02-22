@@ -1,13 +1,13 @@
 package com.fluxo_caixa.user_services.services.impl;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
-import com.fluxo_caixa.user_services.domain.DTO.PaginatedResponse;
 import com.fluxo_caixa.user_services.domain.DTO.UserDTO;
 import com.fluxo_caixa.user_services.domain.converter.UserConverter;
 import com.fluxo_caixa.user_services.domain.model.User;
@@ -29,10 +29,10 @@ public class UserManagementServiceImpl implements UserManagementService {
     }
 
     @Async
-    public CompletableFuture<PaginatedResponse<UserDTO>> getAllUsers(Pageable pageable) {
+    public CompletableFuture<List<UserDTO>> getAllUsers(Pageable pageable) {
         Page<User> users = userRepository.findAll(pageable);
         Page<UserDTO> userDTOs = users.map(UserConverter::toDTO);
-        return CompletableFuture.completedFuture(new PaginatedResponse<>(userDTOs));
+        return CompletableFuture.completedFuture(userDTOs.getContent());
     }
 
     @Async

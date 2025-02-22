@@ -40,7 +40,7 @@ public class UserController {
     @ResponseStatus(HttpStatus.OK)
     public CompletableFuture<ResponseEntity<List<UserDTO>>> getAllUsers(@RequestParam(defaultValue = "1") int page, @RequestParam(defaultValue = "20") int size) {
         Pageable pageable = PageRequest.of(page - 1, size);
-        return userManagementService.getAllUsers(pageable).thenApply(paginatedResponse -> ResponseEntity.ok(paginatedResponse.getContent()));
+        return userManagementService.getAllUsers(pageable).thenApply(ResponseEntity::ok);
     }
 
     @GetMapping("/{id}")

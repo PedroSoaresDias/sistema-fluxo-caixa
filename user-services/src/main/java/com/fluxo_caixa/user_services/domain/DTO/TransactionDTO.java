@@ -5,7 +5,7 @@ import java.time.LocalDate;
 public class TransactionDTO {
     private Long id;
     private Long userId;
-    private Double amount;
+    private double amount;
     private String type;
     private String description;
     private LocalDate date;
@@ -27,11 +27,11 @@ public class TransactionDTO {
         this.userId = userId;
     }
 
-    public Double getAmount() {
+    public double getAmount() {
         return amount;
     }
 
-    public void setAmount(Double amount) {
+    public void setAmount(double amount) {
         this.amount = amount;
     }
 
