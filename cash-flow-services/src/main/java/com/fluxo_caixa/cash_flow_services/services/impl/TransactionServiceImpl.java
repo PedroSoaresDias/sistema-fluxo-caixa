@@ -33,11 +33,12 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     @Async
-    public CompletableFuture<TransactionDTO> createTransaction(TransactionDTO transactionDTO, String jwtToken) {
-        userService.validateUser(transactionDTO.userId(), jwtToken);
+    public CompletableFuture<TransactionDTO> createTransaction(TransactionDTO transactionDTO, Long userId,
+            String jwtToken) {
+        userService.validateUser(userId, jwtToken);
 
         Transaction transaction = new Transaction();
-        transaction.setUserId(transactionDTO.userId());
+        transaction.setUserId(userId);
         transaction.setAmount(transactionDTO.amount());
         transaction.setType(transactionDTO.type());
         transaction.setDescription(transactionDTO.description());
@@ -49,13 +50,13 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     @Async
-    public CompletableFuture<TransactionDTO> updateTransaction(Long id, TransactionDTO transactionDTO, String jwtToken) {
-        userService.validateUser(transactionDTO.userId(), jwtToken);
+    public CompletableFuture<TransactionDTO> updateTransaction(Long id, TransactionDTO transactionDTO, Long userId, String jwtToken) {
+        userService.validateUser(userId, jwtToken);
 
         Transaction transaction = transactionRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Transaction not found with id: " + id));
 
-        transaction.setUserId(transactionDTO.userId());
+        transaction.setUserId(userId);
         transaction.setAmount(transactionDTO.amount());
         transaction.setType(transactionDTO.type());
         transaction.setDescription(transactionDTO.description());

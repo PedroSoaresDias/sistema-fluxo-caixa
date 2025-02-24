@@ -13,27 +13,22 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.fluxo_caixa.user_services.domain.DTO.TransactionDTO;
 import com.fluxo_caixa.user_services.domain.DTO.UserDTO;
 import com.fluxo_caixa.user_services.domain.model.User;
 import com.fluxo_caixa.user_services.services.UserManagementService;
-import com.fluxo_caixa.user_services.services.UserTransactionService;
 
 @RestController
 @RequestMapping("/users")
 public class UserController {
     private final UserManagementService userManagementService;
-    private final UserTransactionService userTransactionService;
 
-    public UserController(UserManagementService userManagementService, UserTransactionService userTransactionService) {
+    public UserController(UserManagementService userManagementService) {
         this.userManagementService = userManagementService;
-        this.userTransactionService = userTransactionService;
     }
 
     @GetMapping
@@ -61,28 +56,11 @@ public class UserController {
         return userManagementService.createUser(user)
                 .thenApply(savedUser -> ResponseEntity.status(HttpStatus.CREATED).build());
     }
-
-    @PostMapping("/{id}/transactions")
-    public CompletableFuture<ResponseEntity<TransactionDTO>> createTransaction(@PathVariable Long id,
-            @RequestBody TransactionDTO transactionDTO, @RequestHeader("Authorization") String authorizationHeader) {
-        String jwtToken = authorizationHeader.substring(7);
-        return userTransactionService.createTransaction(id, transactionDTO, jwtToken).thenApply(savedTransaction -> ResponseEntity.status(HttpStatus.CREATED).build());
-    }
-    
     
     @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public CompletableFuture<ResponseEntity<User>> updateUser(@PathVariable Long id, @RequestBody User user) {
         return userManagementService.updateUser(id, user).thenApply(updatedUser -> ResponseEntity.noContent().build());
-    }
-    
-    @PutMapping("/{id}/transactions/{transactionId}")
-    public CompletableFuture<ResponseEntity<TransactionDTO>> updateTransaction(@PathVariable Long id,
-            @PathVariable Long transactionId, @RequestBody TransactionDTO transactionDTO,
-            @RequestHeader("Authorization") String authorizationHeader) {
-        String jwtToken = authorizationHeader.substring(7);
-        transactionDTO.setId(transactionId);
-        return userTransactionService.updateTransaction(id, transactionDTO, jwtToken).thenApply(updatedTransaction -> ResponseEntity.noContent().build());
     }
     
     @DeleteMapping("/{id}")

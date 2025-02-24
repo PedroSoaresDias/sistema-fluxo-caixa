@@ -87,11 +87,7 @@ public class UserControllerTest {
 
     @Test
     void shouldReturnUserDetailsWhenUserExists() throws Exception {
-        UserDTO user = new UserDTO();
-        user.setId(1L);
-        user.setUsername("Cobaia");
-        user.setEmail("cobaia@test.com");
-
+        UserDTO user = new UserDTO(1L, "Cobaia", "cobaia@test.com");
         when(userService.findUserById(1L)).thenReturn(CompletableFuture.completedFuture(user));
 
         mockMvc.perform(get(BASE_URL + "/1")
