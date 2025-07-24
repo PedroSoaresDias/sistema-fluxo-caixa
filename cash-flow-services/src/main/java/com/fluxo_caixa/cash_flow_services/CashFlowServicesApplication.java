@@ -2,11 +2,13 @@ package com.fluxo_caixa.cash_flow_services;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 import org.springframework.scheduling.annotation.EnableAsync;
 
 import io.github.cdimascio.dotenv.Dotenv;
 
 @EnableAsync
+@EnableDiscoveryClient
 @SpringBootApplication
 public class CashFlowServicesApplication {
 
