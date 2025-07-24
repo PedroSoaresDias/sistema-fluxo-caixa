@@ -9,10 +9,10 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.fluxo-caixa</groupId>
-	<artifactId>auth-services</artifactId>
+	<artifactId>api-gateway</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>auth-services</name>
-	<description>Serviço de autenticação para o sistema de fluxo de caixa</description>
+	<name>api-gateway</name>
+	<description>Demo project for Spring Boot</description>
 	<url/>
 	<licenses>
 		<license/>
@@ -32,37 +32,12 @@
 	</properties>
 	<dependencies>
 		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-security</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-web</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-webflux</artifactId>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-gateway-server-webmvc</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.cloud</groupId>
 			<artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>com.auth0</groupId>
-			<artifactId>java-jwt</artifactId>
-			<version>4.4.0</version>
-		</dependency>
-
-		<dependency>
-        	<groupId>org.projectlombok</groupId>
-        	<artifactId>lombok</artifactId>
-        	<scope>provided</scope>
-    	</dependency>
-
-		<dependency>
-			<groupId>io.github.cdimascio</groupId>
-			<artifactId>dotenv-java</artifactId>
-			<version>3.0.2</version>
 		</dependency>
 
 		<dependency>
@@ -70,13 +45,7 @@
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
 		</dependency>
-		<dependency>
-			<groupId>org.springframework.security</groupId>
-			<artifactId>spring-security-test</artifactId>
-			<scope>test</scope>
-		</dependency>
 	</dependencies>
-
 	<dependencyManagement>
 		<dependencies>
 			<dependency>
