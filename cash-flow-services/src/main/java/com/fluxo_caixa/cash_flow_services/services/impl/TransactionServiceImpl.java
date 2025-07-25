@@ -2,7 +2,6 @@ package com.fluxo_caixa.cash_flow_services.services.impl;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 import org.springframework.http.HttpHeaders;
@@ -32,8 +31,7 @@ public class TransactionServiceImpl implements TransactionService {
         return headers;
     }
 
-    @Async
-    public CompletableFuture<TransactionDTO> createTransaction(TransactionDTO transactionDTO, Long userId,
+    public TransactionDTO createTransaction(TransactionDTO transactionDTO, Long userId,
             String jwtToken) {
         userService.validateUser(userId, jwtToken);
 
@@ -46,11 +44,10 @@ public class TransactionServiceImpl implements TransactionService {
 
         Transaction savedTransaction = transactionRepository.save(transaction);
 
-        return CompletableFuture.completedFuture(convertToDTO(savedTransaction));
+        return convertToDTO(savedTransaction);
     }
 
-    @Async
-    public CompletableFuture<TransactionDTO> updateTransaction(Long id, TransactionDTO transactionDTO, Long userId, String jwtToken) {
+    public TransactionDTO updateTransaction(Long id, TransactionDTO transactionDTO, Long userId, String jwtToken) {
         userService.validateUser(userId, jwtToken);
 
         Transaction transaction = transactionRepository.findById(id)
@@ -63,49 +60,47 @@ public class TransactionServiceImpl implements TransactionService {
 
         Transaction savedTransaction = transactionRepository.save(transaction);
 
-        return CompletableFuture.completedFuture(convertToDTO(savedTransaction));
+        return convertToDTO(savedTransaction);
     }
     
-    @Async
-    public CompletableFuture<Void> deleteTransaction(Long id, String jwtToken) {
+    public Void deleteTransaction(Long id, String jwtToken) {
         createHeaders(jwtToken);
         Transaction transaction = transactionRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Transaction not found with id: " + id));
 
         transactionRepository.delete(transaction);
-        return CompletableFuture.completedFuture(null);
+        return null;
     }
 
-    @Async
-    public CompletableFuture<List<TransactionDTO>> getAllTransactions(String jwtToken) {
+    public List<TransactionDTO> getAllTransactions(String jwtToken) {
         createHeaders(jwtToken);
         List<Transaction> transactions = transactionRepository.findAll();
         List<TransactionDTO> transactionDTOs = transactions.stream()
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
 
-        return CompletableFuture.completedFuture(transactionDTOs);
+        return transactionDTOs;
     }
 
     @Async
-    public CompletableFuture<TransactionDTO> getTransactionById(Long id, String jwtToken) {
+    public TransactionDTO getTransactionById(Long id, String jwtToken) {
         createHeaders(jwtToken);
         Transaction transaction = transactionRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Transaction not found with id: " + id));
 
         TransactionDTO transactionDTO = convertToDTO(transaction);
-        return CompletableFuture.completedFuture(transactionDTO);
+        return transactionDTO;
     }
 
     @Async
-    public CompletableFuture<List<TransactionDTO>> getTransactionsByUserId(Long userId, String jwtToken) {
+    public List<TransactionDTO> getTransactionsByUserId(Long userId, String jwtToken) {
         userService.validateUser(userId, jwtToken);
 
         List<Transaction> transactions = transactionRepository.findByUserId(userId);
         List<TransactionDTO> transactionDTOs = transactions.stream()
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
-        return CompletableFuture.completedFuture(transactionDTOs);
+        return transactionDTOs;
     }
 
     private TransactionDTO convertToDTO(Transaction transaction) {

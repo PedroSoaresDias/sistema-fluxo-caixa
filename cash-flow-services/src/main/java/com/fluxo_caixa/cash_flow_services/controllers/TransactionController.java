@@ -1,7 +1,6 @@
 package com.fluxo_caixa.cash_flow_services.controllers;
 
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
 
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -32,47 +31,50 @@ public class TransactionController {
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    public CompletableFuture<ResponseEntity<List<TransactionDTO>>> getAllTransactions(@RequestHeader(HttpHeaders.AUTHORIZATION) String authHeader) {
+    public ResponseEntity<List<TransactionDTO>> getAllTransactions(@RequestHeader(HttpHeaders.AUTHORIZATION) String authHeader) {
         String jwtToken = authHeader.substring(7);
-        return transactionService.getAllTransactions(jwtToken).thenApply(ResponseEntity::ok);
+        return ResponseEntity.ok(transactionService.getAllTransactions(jwtToken));
     }
 
     @GetMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public CompletableFuture<ResponseEntity<TransactionDTO>> getTransactionById(@PathVariable Long id,
+    public ResponseEntity<TransactionDTO> getTransactionById(@PathVariable Long id,
             @RequestHeader(HttpHeaders.AUTHORIZATION) String authHeader) {
         String jwtToken = authHeader.substring(7);
-        return transactionService.getTransactionById(id, jwtToken).thenApply(ResponseEntity::ok);
+        return ResponseEntity.ok(transactionService.getTransactionById(id, jwtToken));
     }
 
     @GetMapping("/user/{userId}")
     @ResponseStatus(HttpStatus.OK)
-    public CompletableFuture<ResponseEntity<List<TransactionDTO>>> getTransactionsByUserId(@PathVariable Long userId,
+    public ResponseEntity<List<TransactionDTO>> getTransactionsByUserId(@PathVariable Long userId,
             @RequestHeader(HttpHeaders.AUTHORIZATION) String authHeader) {
         String jwtToken = authHeader.substring(7);
-        return transactionService.getTransactionsByUserId(userId, jwtToken).thenApply(ResponseEntity::ok);
+        return ResponseEntity.ok(transactionService.getTransactionsByUserId(userId, jwtToken));
     }
 
     @PostMapping("/user/{userId}")
     @ResponseStatus(HttpStatus.CREATED)
-    public CompletableFuture<ResponseEntity<TransactionDTO>> createTransaction(@PathVariable Long userId,
+    public ResponseEntity<TransactionDTO> createTransaction(@PathVariable Long userId,
             @RequestBody TransactionDTO transactionDTO, @RequestHeader(HttpHeaders.AUTHORIZATION) String authHeader) {
         String jwtToken = authHeader.substring(7);
-        return transactionService.createTransaction(transactionDTO, userId, jwtToken).thenApply(savedTransaction -> ResponseEntity.status(HttpStatus.CREATED).build());
+        transactionService.createTransaction(transactionDTO, userId, jwtToken);
+        return ResponseEntity.status(HttpStatus.CREATED).build(); 
     }
 
     @PutMapping("/{id}/user/{userId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public CompletableFuture<ResponseEntity<TransactionDTO>> updateTransaction(@PathVariable Long id, @PathVariable Long userId,
+    public ResponseEntity<TransactionDTO> updateTransaction(@PathVariable Long id, @PathVariable Long userId,
             @RequestBody TransactionDTO transactionDTO, @RequestHeader(HttpHeaders.AUTHORIZATION) String authHeader) {
         String jwtToken = authHeader.substring(7);
-        return transactionService.updateTransaction(id, transactionDTO, userId, jwtToken).thenApply(updatedTransaction -> ResponseEntity.noContent().build());
+        transactionService.updateTransaction(id, transactionDTO, userId, jwtToken);
+        return ResponseEntity.noContent().build();
     }
     
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public CompletableFuture<ResponseEntity<Void>> deleteTransaction(@PathVariable Long id, @RequestHeader(HttpHeaders.AUTHORIZATION) String authHeader) {
+    public ResponseEntity<Void> deleteTransaction(@PathVariable Long id, @RequestHeader(HttpHeaders.AUTHORIZATION) String authHeader) {
         String jwtToken = authHeader.substring(7);
-        return transactionService.deleteTransaction(id, jwtToken).thenApply(deletedTransaction -> ResponseEntity.noContent().build());
+        transactionService.deleteTransaction(id, jwtToken);
+        return ResponseEntity.noContent().build();
     }
 }
