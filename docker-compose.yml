@@ -2,15 +2,34 @@ networks:
   fluxo-caixa-network:
 
 services:
-  fluxo-caixa-user:
-    image: fluxo-caixa-user
-    container_name: fluxo-caixa-user
+  fluxo-caixa-discovery:
+    image: fluxo-caixa-discovery
+    container_name: fluxo-caixa-discovery
     ports:
-      - 8080:8080
+      - 8761:8761
     environment:
       - SPRING_PROFILES_ACTIVE=docker
     networks:
       - fluxo-caixa-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8761"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  fluxo-caixa-user:
+    image: fluxo-caixa-user
+    container_name: fluxo-caixa-user
+    ports:
+      - 8083:8083
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - eureka.client.service-url.defaultZone=http://fluxo-caixa-discovery:8761/eureka/
+
+    networks:
+      - fluxo-caixa-network
+    depends_on:
+      - fluxo-caixa-discovery
   
   fluxo-caixa-auth:
     image: fluxo-caixa-auth
@@ -22,8 +41,12 @@ services:
     environment:
       DOCKER_ENV: 1
       SPRING_PROFILES_ACTIVE: docker
+      eureka.client.service-url.defaultZone: http://fluxo-caixa-discovery:8761/eureka/
+
     networks:
       - fluxo-caixa-network
+    depends_on:
+      - fluxo-caixa-discovery
 
   fluxo-caixa-transaction:
     image: fluxo-caixa-transaction
@@ -35,5 +58,23 @@ services:
     environment:
       - DOCKER_ENV=2
       - SPRING_PROFILES_ACTIVE=docker
+      - eureka.client.service-url.defaultZone=http://fluxo-caixa-discovery:8761/eureka/
+
     networks:
       - fluxo-caixa-network
+    depends_on:
+      - fluxo-caixa-discovery
+
+  fluxo-caixa-gateway:
+    image: fluxo-caixa-gateway
+    container_name: fluxo-caixa-gateway
+    ports:
+      - 8080:8080
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - eureka.client.service-url.defaultZone=http://fluxo-caixa-discovery:8761/eureka/
+
+    networks:
+      - fluxo-caixa-network
+    depends_on:
+      - fluxo-caixa-discovery

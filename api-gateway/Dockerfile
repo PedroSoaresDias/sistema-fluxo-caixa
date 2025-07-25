@@ -9,8 +9,8 @@ FROM eclipse-temurin:21-jre-alpine
 
 WORKDIR /app
 
-COPY --from=builder target/*.jar cash-flow-services.jar
+COPY --from=builder target/*.jar gateway-services.jar
 
-EXPOSE 8082
+EXPOSE 8080
 
-CMD [ "java", "-jar", "cash-flow-services.jar" ]
+CMD [ "java", "-jar", "gateway-services.jar" ]

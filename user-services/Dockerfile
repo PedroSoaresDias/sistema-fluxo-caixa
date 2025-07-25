@@ -1,4 +1,4 @@
-FROM maven:3.9.9-eclipse-temurin-21-alpine as builder
+FROM maven:3.9.9-eclipse-temurin-21-alpine AS builder
 
 COPY pom.xml .
 COPY src ./src
@@ -11,6 +11,6 @@ WORKDIR /app
 
 COPY --from=builder target/*.jar user-services.jar
 
-EXPOSE 8080
+EXPOSE 8083
 
 CMD [ "java", "-jar", "user-services.jar" ]
