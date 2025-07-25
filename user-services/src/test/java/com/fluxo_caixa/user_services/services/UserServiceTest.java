@@ -13,7 +13,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.Optional;
-import java.util.concurrent.CompletableFuture;
 
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -52,9 +51,9 @@ public class UserServiceTest {
         when(passwordEncoder.encode(anyString())).thenReturn("senhaProtegida");
         when(userRepository.save(any(User.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-        CompletableFuture<User> result = userManagementService.createUser(user);
+        User result = userManagementService.createUser(user);
 
-        User createUser = result.join();
+        User createUser = result;
 
         assertEquals("senhaProtegida", createUser.getSenha());
         assertEquals("Cobaia", createUser.getUsername());
@@ -73,9 +72,9 @@ public class UserServiceTest {
         when(passwordEncoder.encode("1234abc")).thenReturn("senhaProtegida");
         when(userRepository.save(any(User.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-        CompletableFuture<User> result = userManagementService.updateUser(1L, user);
+        User result = userManagementService.updateUser(1L, user);
 
-        User updatedUser = result.join();
+        User updatedUser = result;
 
         assertEquals("Cobaia", updatedUser.getUsername());
         assertEquals("cobaia@test.com", updatedUser.getEmail());

@@ -2,7 +2,6 @@ package com.fluxo_caixa.user_services.services.impl;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.scheduling.annotation.Async;
@@ -28,37 +27,32 @@ public class UserManagementServiceImpl implements UserManagementService {
         this.passwordEncoder = passwordEncoder;
     }
 
-    @Async
-    public CompletableFuture<List<UserDTO>> getAllUsers(Pageable pageable) {
+    public List<UserDTO> getAllUsers(Pageable pageable) {
         Page<User> users = userRepository.findAll(pageable);
         Page<UserDTO> userDTOs = users.map(UserConverter::toDTO);
-        return CompletableFuture.completedFuture(userDTOs.getContent());
+        return userDTOs.getContent();
     }
 
-    @Async
-    public CompletableFuture<UserDTO> findUserById(Long id) {
+    public UserDTO findUserById(Long id) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + id));
         UserDTO userDTO = UserConverter.toDTO(user);
-        return CompletableFuture.completedFuture(userDTO);
+        return userDTO;
     }
 
-    @Async
-    public CompletableFuture<User> findUserByUsername(String username) {
+    public User findUserByUsername(String username) {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new EntityNotFoundException("User not found with username: " + username));
-        return CompletableFuture.completedFuture(user);
+        return user;
     }
 
-    @Async
-    public CompletableFuture<User> createUser(User user) {
+    public User createUser(User user) {
         user.setSenha(passwordEncoder.encode(user.getSenha()));
         user.setCreatedAt(LocalDateTime.now());
-        return CompletableFuture.completedFuture(userRepository.save(user));
+        return userRepository.save(user);
     }
 
-    @Async
-    public CompletableFuture<User> updateUser(Long id, User userDetail) {
+    public User updateUser(Long id, User userDetail) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + id));
 
@@ -69,14 +63,14 @@ public class UserManagementServiceImpl implements UserManagementService {
             user.setSenha(passwordEncoder.encode(userDetail.getSenha()));
         }
 
-        return CompletableFuture.completedFuture(userRepository.save(user));
+        return userRepository.save(user);
     }
 
     @Async
-    public CompletableFuture<Void> deleteUser(Long id) {
+    public Void deleteUser(Long id) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + id));
         userRepository.delete(user);
-        return CompletableFuture.completedFuture(null);
+        return null;
     }
 }

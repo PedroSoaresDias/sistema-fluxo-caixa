@@ -1,31 +1,19 @@
 package com.fluxo_caixa.user_services.controllers;
 
-// import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-// import static org.mockito.ArgumentMatchers.anyLong;
-// import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-// import java.time.LocalDate;
 import java.time.LocalDateTime;
-// import java.util.Date;
-import java.util.concurrent.CompletableFuture;
 
 import org.junit.jupiter.api.Test;
-// import org.junit.jupiter.api.extension.ExtendWith;
-// import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
-// import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-// import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
-// import org.springframework.security.test.context.support.WithMockUser;
-// import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -49,7 +37,7 @@ public class UserControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
-    @MockBean
+    @MockitoBean
     private UserManagementService userService;
 
     @Autowired
@@ -72,7 +60,7 @@ public class UserControllerTest {
     void shouldCreateUserAndReturnCreatedStatus() throws Exception {
         User user = createTestUser();
 
-        when(userService.createUser(any(User.class))).thenReturn(CompletableFuture.completedFuture(user));
+        when(userService.createUser(any(User.class))).thenReturn(user);
 
         mockMvc.perform(post(BASE_URL)
                 .contentType(JSON)
@@ -88,7 +76,8 @@ public class UserControllerTest {
     @Test
     void shouldReturnUserDetailsWhenUserExists() throws Exception {
         UserDTO user = new UserDTO(1L, "Cobaia", "cobaia@test.com");
-        when(userService.findUserById(1L)).thenReturn(CompletableFuture.completedFuture(user));
+        when(userService.findUserById(1L))
+                .thenReturn(user);
 
         mockMvc.perform(get(BASE_URL + "/1")
                 .content(objectMapper.writeValueAsString(user)))
@@ -114,7 +103,7 @@ public class UserControllerTest {
     void testUpdateUser() throws Exception {
         User user = createTestUser();
 
-        when(userService.updateUser(eq(1L), any(User.class))).thenReturn(CompletableFuture.completedFuture(user));
+        when(userService.updateUser(eq(1L), any(User.class))).thenReturn(user);
 
         mockMvc.perform(put(BASE_URL + "/1")
                 .contentType(JSON)
@@ -130,7 +119,7 @@ public class UserControllerTest {
 
     @Test
     void testDeleteUserById() throws Exception {
-        when(userService.deleteUser(1L)).thenReturn(CompletableFuture.completedFuture(null));
+        when(userService.deleteUser(1L)).thenReturn(null);
 
         mockMvc.perform(delete(BASE_URL + "/1"))
                 .andExpect(status().isNoContent());

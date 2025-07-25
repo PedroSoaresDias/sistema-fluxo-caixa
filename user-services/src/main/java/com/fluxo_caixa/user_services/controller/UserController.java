@@ -1,7 +1,6 @@
 package com.fluxo_caixa.user_services.controller;
 
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
 
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -33,39 +32,41 @@ public class UserController {
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    public CompletableFuture<ResponseEntity<List<UserDTO>>> getAllUsers(@RequestParam(defaultValue = "1") int page, @RequestParam(defaultValue = "20") int size) {
+    public ResponseEntity<List<UserDTO>> getAllUsers(@RequestParam(defaultValue = "1") int page, @RequestParam(defaultValue = "20") int size) {
         Pageable pageable = PageRequest.of(page - 1, size);
-        return userManagementService.getAllUsers(pageable).thenApply(ResponseEntity::ok);
+        return ResponseEntity.ok(userManagementService.getAllUsers(pageable));
     }
 
     @GetMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public CompletableFuture<ResponseEntity<UserDTO>> findUserById(@PathVariable Long id) {
-        return userManagementService.findUserById(id).thenApply(ResponseEntity::ok);
+    public ResponseEntity<UserDTO> findUserById(@PathVariable Long id) {
+        return ResponseEntity.ok(userManagementService.findUserById(id));
     }
 
     @GetMapping("/username/{username}")
     @ResponseStatus(HttpStatus.OK)
-    public CompletableFuture<ResponseEntity<User>> findUserByUsername(@PathVariable String username) {
-        return userManagementService.findUserByUsername(username).thenApply(ResponseEntity::ok);
+    public ResponseEntity<User> findUserByUsername(@PathVariable String username) {
+        return ResponseEntity.ok(userManagementService.findUserByUsername(username));
     }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public CompletableFuture<ResponseEntity<User>> createUser(@RequestBody User user) {
-        return userManagementService.createUser(user)
-                .thenApply(savedUser -> ResponseEntity.status(HttpStatus.CREATED).build());
+    public ResponseEntity<User> createUser(@RequestBody User user) {
+        userManagementService.createUser(user);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
     
     @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public CompletableFuture<ResponseEntity<User>> updateUser(@PathVariable Long id, @RequestBody User user) {
-        return userManagementService.updateUser(id, user).thenApply(updatedUser -> ResponseEntity.noContent().build());
+    public ResponseEntity<User> updateUser(@PathVariable Long id, @RequestBody User user) {
+        userManagementService.updateUser(id, user);
+        return ResponseEntity.noContent().build();
     }
     
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public CompletableFuture<ResponseEntity<Void>> deleteUser(@PathVariable Long id) {
-        return userManagementService.deleteUser(id).thenApply(deletedUser -> ResponseEntity.noContent().build());
+    public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
+        userManagementService.deleteUser(id);
+        return ResponseEntity.noContent().build();
     }
 }
