@@ -6,8 +6,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.fluxo_caixa.auth_services.domain.DTO.*;
+import com.fluxo_caixa.auth_services.exceptions.AuthenticationException;
 import com.fluxo_caixa.auth_services.services.AuthService;
-import java.util.concurrent.CompletableFuture;
 import org.springframework.http.ResponseEntity;
 
 @RestController
@@ -20,8 +20,13 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public CompletableFuture<ResponseEntity<AuthResponse>> login(@RequestBody AuthRequest authRequest) {
-        return authService.authenticate(authRequest).thenApply(ResponseEntity::ok)
-                .exceptionally(e -> ResponseEntity.status(401).body(new AuthResponse(e.getMessage())));
+    public ResponseEntity<AuthResponse> login(@RequestBody AuthRequest authRequest) {
+        try {
+            return ResponseEntity.ok(authService.authenticate(authRequest));
+        } catch (AuthenticationException e) {
+            return ResponseEntity.status(401).body(new AuthResponse(e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(new AuthResponse("Erro interno do servidor"));
+        }
     }
 }

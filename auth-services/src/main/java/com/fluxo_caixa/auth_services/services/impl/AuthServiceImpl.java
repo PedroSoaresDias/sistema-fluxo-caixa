@@ -1,7 +1,5 @@
 package com.fluxo_caixa.auth_services.services.impl;
 
-import java.util.concurrent.CompletableFuture;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -20,21 +18,20 @@ public class AuthServiceImpl implements AuthService {
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenGenerator jwtTokenGenerator;
 
-    public AuthServiceImpl(UserService userService, PasswordEncoder passwordEncoder, JwtTokenGenerator jwtTokenGenerator) {
+    public AuthServiceImpl(UserService userService, PasswordEncoder passwordEncoder,
+            JwtTokenGenerator jwtTokenGenerator) {
         this.userService = userService;
         this.passwordEncoder = passwordEncoder;
         this.jwtTokenGenerator = jwtTokenGenerator;
     }
 
-    public CompletableFuture<AuthResponse> authenticate(AuthRequest authRequest) {
-        return CompletableFuture.supplyAsync(() -> {
-            AuthRequest user = userService.getUserByUsername(authRequest.username());
-            if (!passwordEncoder.matches(authRequest.senha(), user.senha())) {
-                throw new RuntimeException("Credenciais inválidas");
-            }
-            String token = jwtTokenGenerator.generateToken(user.username());
-            logger.info("Autenticando usuário: {}", authRequest.username());
-            return new AuthResponse(token);
-        });
+    public AuthResponse authenticate(AuthRequest authRequest) {
+        AuthRequest user = userService.getUserByUsername(authRequest.username());
+        if (!passwordEncoder.matches(authRequest.senha(), user.senha())) {
+            throw new RuntimeException("Credenciais inválidas");
+        }
+        String token = jwtTokenGenerator.generateToken(user.username());
+        logger.info("Autenticando usuário: {}", authRequest.username());
+        return new AuthResponse(token);
     }
 }
